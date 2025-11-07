@@ -2,7 +2,7 @@
 
 interface InventoryItemProps {
   item: {
-    id: string;
+    _id: string;
     name: string;
     type: string;
     quantity: number;
@@ -13,7 +13,7 @@ interface InventoryItemProps {
 /**
  * Render a styled inventory card for a single item.
  *
- * @param item - The inventory item to display; expected fields: `id`, `name`, `type`, `quantity`, and `weight`.
+ * @param item - The inventory item to display; expected fields: `_id`, `name`, `type`, `quantity`, and `weight`.
  * @returns A JSX element containing the item's name, a colored type badge, quantity, and total weight in pounds.
  */
 export default function InventoryItem({ item }: InventoryItemProps) {

@@ -39,7 +39,7 @@ export interface CharacterStats {
 
 // Inventory Types
 export interface InventoryItem {
-  id: string;
+  _id: string;
   name: string;
   type: 'weapon' | 'armor' | 'potion' | 'tool' | 'misc';
   quantity: number;
