@@ -55,6 +55,7 @@ export default function LoginForm() {
             id="username"
             type="text"
             required
+            autoComplete="username"
             value={formData.username}
             onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-white"
@@ -70,6 +71,7 @@ export default function LoginForm() {
             id="password"
             type="password"
             required
+            autoComplete="current-password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-white"
