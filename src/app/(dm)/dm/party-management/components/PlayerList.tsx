@@ -11,6 +11,12 @@ import { useState } from 'react';
  */
 export default function PlayerList() {
   const [selectedPlayer, setSelectedPlayer] = useState('1');
+  const [showAddPlayerForm, setShowAddPlayerForm] = useState(false);
+
+  const handleAddPlayer = () => {
+    setShowAddPlayerForm(true);
+    // TODO: Implement add player form logic
+  };
 
   const players = [
     { id: '1', username: 'player1', characterName: 'Thaldrin Ironforge', online: true },
@@ -43,7 +49,12 @@ export default function PlayerList() {
         ))}
       </div>
 
-      <button className="mt-4 w-full py-2 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-red-500 hover:text-red-400 transition-colors text-sm">
+      <button
+        type="button"
+        onClick={handleAddPlayer}
+        aria-label="Add new player to the party"
+        className="mt-4 w-full py-2 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-red-500 hover:text-red-400 transition-colors text-sm"
+      >
         + Add Player
       </button>
     </div>
