@@ -51,13 +51,19 @@ export default function CharacterOverview() {
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-400">HP</span>
                   <span className="text-gray-300">
-                    {char.hp} / {char.maxHp}
+                    {char.hp} / {char.maxHp || 0}
                   </span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-2">
                   <div
                     className="bg-red-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(char.hp / char.maxHp) * 100}%` }}
+                    style={{
+                      width: `${(() => {
+                        const ratio = char.maxHp ? char.hp / char.maxHp : 0;
+                        const clampedRatio = Math.max(0, Math.min(1, ratio));
+                        return clampedRatio * 100;
+                      })()}%`
+                    }}
                   />
                 </div>
               </div>
