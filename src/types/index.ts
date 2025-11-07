@@ -65,13 +65,12 @@ export interface Map {
   name: string;
   imageUrl: string;
   markers: MapMarker[];
-  fogOfWar?: FogOfWarLayer[];
   createdAt: number;
   updatedAt: number;
 }
 
 export interface MapMarker {
-  id: string;
+  _id: string;
   type: 'player' | 'npc' | 'enemy' | 'poi';
   x: number;
   y: number;
@@ -79,12 +78,6 @@ export interface MapMarker {
   color?: string;
   iconUrl?: string;
   visible: boolean;
-}
-
-export interface FogOfWarLayer {
-  id: string;
-  points: { x: number; y: number }[];
-  revealed: boolean;
 }
 
 // Campaign Types
