@@ -3,6 +3,11 @@ import QuickActions from './components/QuickActions';
 import RecentActivity from './components/RecentActivity';
 import CharacterOverview from './components/CharacterOverview';
 
+/**
+ * Renders the dashboard page layout composed of the header, main content (character overview and recent activity), and sidebar quick actions.
+ *
+ * @returns The JSX element for the dashboard page.
+ */
 export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-950">

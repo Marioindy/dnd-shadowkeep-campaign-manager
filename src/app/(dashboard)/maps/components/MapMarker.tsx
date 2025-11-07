@@ -11,6 +11,14 @@ interface MapMarkerProps {
   };
 }
 
+/**
+ * Render a circular map marker at the given coordinates with an optional hover tooltip.
+ *
+ * Displays a colored circular badge centered at (marker.x, marker.y). The badge shows the first character of `marker.label` or `'?'` when no label is provided; if `marker.label` is present, the full label appears in a non-interactive tooltip on hover.
+ *
+ * @param marker - Marker data: `id` (string), `x` and `y` (coordinates used for CSS `left`/`top`), `type` (string), optional `label` (string) and optional `color` (CSS color string)
+ * @returns A JSX element that visually represents the positioned map marker and its tooltip
+ */
 export default function MapMarker({ marker }: MapMarkerProps) {
   return (
     <div

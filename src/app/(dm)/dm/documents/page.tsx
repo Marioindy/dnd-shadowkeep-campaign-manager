@@ -2,6 +2,11 @@ import DMHeader from '../components/DMHeader';
 import DocumentList from './components/DocumentList';
 import DocumentUploader from './components/DocumentUploader';
 
+/**
+ * Renders the Documents page for the DM area, including the header, page title/subtitle, and a responsive layout for uploading and listing documents.
+ *
+ * @returns The JSX element for the Documents page containing the DM header, a title/subtitle section, and a responsive two-column area with the document uploader and document list.
+ */
 export default function DocumentsPage() {
   return (
     <div className="min-h-screen bg-gray-950">

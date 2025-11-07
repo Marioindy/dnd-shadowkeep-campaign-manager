@@ -2,6 +2,15 @@
 
 import Link from 'next/link';
 
+/**
+ * Render the DM Panel header with a title, responsive navigation, and a Player View link.
+ *
+ * The header includes a gradient-styled "DM Panel" title, a navigation bar with links to
+ * Overview, Party Management, Map Control, and Documents (navigation is hidden on small screens
+ * and visible on medium screens and larger), and a right-aligned "Player View" link to the dashboard.
+ *
+ * @returns A JSX.Element containing the styled header and its navigation elements.
+ */
 export default function DMHeader() {
   return (
     <header className="bg-gray-900 border-b border-gray-800">

@@ -2,6 +2,13 @@
 
 import { useState } from 'react';
 
+/**
+ * Renders a selectable list of players with usernames, character names, and online indicators.
+ *
+ * Displays each player as a button that updates internal selection state when clicked and provides an action button to add a player.
+ *
+ * @returns The component's root JSX element containing the player list and add-player control.
+ */
 export default function PlayerList() {
   const [selectedPlayer, setSelectedPlayer] = useState('1');
 

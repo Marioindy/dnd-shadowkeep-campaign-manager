@@ -2,6 +2,11 @@ import DashboardHeader from '../dashboard/components/DashboardHeader';
 import MapViewer from './components/MapViewer';
 import MapList from './components/MapList';
 
+/**
+ * Render the Campaign Maps page showing a header, a sidebar list of maps, and a map viewer.
+ *
+ * @returns The page's React element containing the dashboard header, a title/subtitle, and a responsive two-column layout with a map list and map viewer.
+ */
 export default function MapsPage() {
   return (
     <div className="min-h-screen bg-gray-950">

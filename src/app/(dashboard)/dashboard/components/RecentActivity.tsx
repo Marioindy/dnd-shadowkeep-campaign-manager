@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Render a styled "Recent Activity" panel displaying a static list of activity items.
+ *
+ * Each item shows a colored status dot, a message, and a relative timestamp. The list is defined
+ * statically within the component and each row is visually separated by a bottom border except the last.
+ *
+ * @returns The React element representing the recent activity panel.
+ */
 export default function RecentActivity() {
   const activities = [
     { id: 1, type: 'character', message: 'Created character "Thaldrin"', time: '2 hours ago' },

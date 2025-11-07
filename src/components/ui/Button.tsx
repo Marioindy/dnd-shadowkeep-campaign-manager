@@ -7,6 +7,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
+/**
+ * Render a styled button element with configurable visual variant and size.
+ *
+ * @param variant - Visual style of the button: `'primary'`, `'secondary'`, `'danger'`, or `'ghost'`
+ * @param size - Size of the button: `'sm'`, `'md'`, or `'lg'`
+ * @param className - Additional CSS classes to merge with the component's default classes
+ * @param children - Content to render inside the button
+ * @param props - Any other native button attributes to forward to the underlying element
+ * @returns The rendered HTML button element with composed classes and forwarded props
+ */
 export default function Button({
   variant = 'primary',
   size = 'md',

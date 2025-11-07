@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Render a UI card for selecting a PNG or JPG map image, entering a map name, and triggering an upload action.
+ *
+ * The component includes a hidden file input (accepting image/png and image/jpeg), a labeled drop/click area, a text field for the map name, and an "Upload Map" button. Selecting a file logs the selected file name to the console; the actual file upload implementation is not provided.
+ *
+ * @returns A JSX element containing the map upload UI
+ */
 export default function MapUploader() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

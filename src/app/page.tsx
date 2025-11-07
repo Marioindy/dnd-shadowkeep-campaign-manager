@@ -1,5 +1,14 @@
 import Link from 'next/link';
 
+/**
+ * Renders the landing page containing a hero, primary actions, and a features grid.
+ *
+ * The hero includes the "Shadowkeep" title, a subtitle and description, two prominent
+ * navigation links (Login and View Dashboard), and a responsive three-card grid
+ * describing Character Management, Interactive Maps, and Session Persistence.
+ *
+ * @returns The homepage JSX element.
+ */
 export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">

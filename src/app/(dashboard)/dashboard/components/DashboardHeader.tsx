@@ -3,6 +3,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+/**
+ * Header bar for the dashboard that displays branding, navigation, and user controls.
+ *
+ * Renders the Shadowkeep brand link, primary navigation links, a welcome message with the current user's username, and a DM Panel link when the user's role equals 'dm'.
+ *
+ * @returns The header React element for the dashboard layout.
+ */
 export default function DashboardHeader() {
   const [user] = useState({ username: 'Player', role: 'player' });
 

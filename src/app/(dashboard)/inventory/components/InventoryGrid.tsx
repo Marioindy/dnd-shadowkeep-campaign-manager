@@ -2,6 +2,13 @@
 
 import InventoryItem from './InventoryItem';
 
+/**
+ * Renders an inventory dashboard section showing a list of items and their aggregate weight.
+ *
+ * Displays a header with the title and computed total weight, a responsive grid of InventoryItem entries, and a full-width "Add New Item" button.
+ *
+ * @returns A JSX element containing the inventory grid UI.
+ */
 export default function InventoryGrid() {
   const items = [
     { id: '1', name: 'Longsword +1', type: 'weapon', quantity: 1, weight: 3 },

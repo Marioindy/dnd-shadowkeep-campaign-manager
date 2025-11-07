@@ -2,6 +2,15 @@
 
 import { useState } from 'react';
 
+/**
+ * Render a selectable list of predefined maps with an upload action.
+ *
+ * Renders a titled card ("Available Maps") containing buttons for each map (name and marker count).
+ * Clicking a map updates the component's internal selection state and highlights the selected item.
+ * A full-width "+ Upload Map" dashed button is shown below the list.
+ *
+ * @returns A JSX element representing the map list UI
+ */
 export default function MapList() {
   const [selectedMap, setSelectedMap] = useState('1');
 

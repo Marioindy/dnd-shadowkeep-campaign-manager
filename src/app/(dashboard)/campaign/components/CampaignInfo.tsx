@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * Render a styled campaign overview card that displays a static campaign's metadata and player badges.
+ *
+ * Renders the campaign title and description, a grid with Dungeon Master, sessions played, current level,
+ * and active players count, and a wrapped list of party member badges. The component uses an internal
+ * hardcoded `campaign` object as its data source.
+ *
+ * @returns A JSX element containing the campaign overview card
+ */
 export default function CampaignInfo() {
   const campaign = {
     name: 'The Shadowkeep Chronicles',

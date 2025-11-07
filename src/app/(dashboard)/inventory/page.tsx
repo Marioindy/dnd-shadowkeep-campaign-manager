@@ -2,6 +2,14 @@ import DashboardHeader from '../dashboard/components/DashboardHeader';
 import InventoryGrid from './components/InventoryGrid';
 import EquipmentSlots from './components/EquipmentSlots';
 
+/**
+ * Render the Inventory page with a dashboard header, equipment slots, and an inventory grid arranged responsively.
+ *
+ * The layout centers content within a max width, shows a title and subtitle, and uses a 1-column grid on small
+ * screens that becomes a 3-column grid on large screens (equipment slots span 1 column, inventory grid spans 2).
+ *
+ * @returns A JSX element containing the inventory page layout
+ */
 export default function InventoryPage() {
   return (
     <div className="min-h-screen bg-gray-950">

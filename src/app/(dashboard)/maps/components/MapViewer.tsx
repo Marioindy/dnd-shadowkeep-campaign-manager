@@ -3,6 +3,16 @@
 import { useRef, useEffect, useState } from 'react';
 import MapMarkerComponent from './MapMarker';
 
+/**
+ * Renders an interactive map viewer with draggable panning, zoom controls, and markers.
+ *
+ * The component displays a placeholder map area with a grid, a header with zoom and reset controls,
+ * and a footer hint. Users can pan by click-dragging the map and zoom with the mouse wheel or
+ * the ± buttons; zoom is constrained between 50% and 300%. Markers from local state are rendered
+ * via MapMarkerComponent.
+ *
+ * @returns A JSX element containing the map viewer UI
+ */
 export default function MapViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [markers, setMarkers] = useState([

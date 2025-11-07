@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Render a detailed profile card for a D&D-style character.
+ *
+ * The component displays the character's name, level, race, and class; a grid of ability scores
+ * with D&D-style modifiers; summary cards for health, armor class, and speed; and an inventory list.
+ *
+ * @returns A JSX element rendering the full character details view (header, stats grid, summaries, and inventory).
+ */
 export default function CharacterDetails() {
   const character = {
     name: 'Thaldrin Ironforge',

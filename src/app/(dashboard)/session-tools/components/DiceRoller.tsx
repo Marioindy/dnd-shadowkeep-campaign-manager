@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 
+/**
+ * Renders a Dice Roller interface with buttons for common dice; clicking a die generates a roll, displays the numeric result, and prepends a recent-roll entry (keeps up to 4 items).
+ *
+ * @returns The component's JSX element containing the dice buttons, current result panel (when present), and recent rolls list (when non-empty).
+ */
 export default function DiceRoller() {
   const [result, setResult] = useState<number | null>(null);
   const [history, setHistory] = useState<Array<{ roll: string; result: number }>>([]);

@@ -2,6 +2,14 @@ import DMHeader from '../components/DMHeader';
 import PlayerList from './components/PlayerList';
 import CharacterDetails from './components/CharacterDetails';
 
+/**
+ * Renders the Party Management page layout with a header, a player list, and character details.
+ *
+ * The layout uses a responsive grid: a single-column layout on small screens and a three-column grid on large screens
+ * where the player list occupies the first column and character details span the remaining two columns.
+ *
+ * @returns The component's JSX element representing the Party Management page.
+ */
 export default function PartyManagementPage() {
   return (
     <div className="min-h-screen bg-gray-950">

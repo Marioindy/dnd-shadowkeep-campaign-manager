@@ -3,6 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+/**
+ * Renders a login form for collecting username and password, manages loading and error states, and navigates to the dashboard on successful submission.
+ *
+ * The form disables the submit button while a submission is in progress and displays an error message when authentication fails.
+ *
+ * @returns The rendered login form as a JSX element.
+ */
 export default function LoginForm() {
   const router = useRouter();
   const [formData, setFormData] = useState({

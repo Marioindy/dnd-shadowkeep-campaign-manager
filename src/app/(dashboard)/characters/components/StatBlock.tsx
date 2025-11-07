@@ -6,6 +6,16 @@ interface StatBlockProps {
   modifier?: number;
 }
 
+/**
+ * Renders a centered stat block showing a label, a numeric value, and a formatted modifier.
+ *
+ * If `modifier` is omitted, the modifier is derived as Math.floor((value - 10) / 2).
+ *
+ * @param label - Short descriptor shown above the value
+ * @param value - Numeric stat value to display
+ * @param modifier - Optional explicit modifier to display instead of the derived value
+ * @returns The JSX element for the stat block containing the label, value, and formatted modifier
+ */
 export default function StatBlock({ label, value, modifier }: StatBlockProps) {
   const calculatedModifier = modifier ?? Math.floor((value - 10) / 2);
   const modifierString = calculatedModifier >= 0 ? `+${calculatedModifier}` : `${calculatedModifier}`;

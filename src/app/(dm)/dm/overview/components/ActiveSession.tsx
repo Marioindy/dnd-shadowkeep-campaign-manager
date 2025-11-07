@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * Displays an "Active Session" panel containing session status, quick-action buttons, and a notes textarea.
+ *
+ * @returns The JSX element for the Active Session UI.
+ */
 export default function ActiveSession() {
   return (
     <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">

@@ -2,6 +2,14 @@ import DashboardHeader from '../dashboard/components/DashboardHeader';
 import DiceRoller from './components/DiceRoller';
 import InitiativeTracker from './components/InitiativeTracker';
 
+/**
+ * Render the Session Tools page layout for the dashboard.
+ *
+ * Displays a dashboard header, a page title and subtitle, and a responsive grid
+ * that hosts the dice roller and initiative tracker components.
+ *
+ * @returns A JSX element containing the session tools page layout.
+ */
 export default function SessionToolsPage() {
   return (
     <div className="min-h-screen bg-gray-950">
