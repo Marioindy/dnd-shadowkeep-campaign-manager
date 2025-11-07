@@ -1,6 +1,11 @@
 import DashboardHeader from '../dashboard/components/DashboardHeader';
 import CharacterList from './components/CharacterList';
 
+/**
+ * Render the dashboard "Characters" page containing a header, page title and subtitle, and the character list.
+ *
+ * @returns A JSX element representing the Characters page layout
+ */
 export default function CharactersPage() {
   return (
     <div className="min-h-screen bg-gray-950">

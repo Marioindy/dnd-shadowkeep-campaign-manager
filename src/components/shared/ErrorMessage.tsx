@@ -3,6 +3,13 @@ interface ErrorMessageProps {
   onRetry?: () => void;
 }
 
+/**
+ * Render a red-themed error banner that displays a message and an optional retry action.
+ *
+ * @param message - The error text to display inside the banner.
+ * @param onRetry - Optional callback invoked when the user clicks the "Try again" button; if omitted the button is not rendered.
+ * @returns The React element representing the error banner.
+ */
 export default function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
   return (
     <div className="bg-red-500/10 border border-red-500 rounded-lg p-4">

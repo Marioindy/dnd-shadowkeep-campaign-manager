@@ -3,6 +3,14 @@ import CampaignInfo from './components/CampaignInfo';
 import SessionLog from './components/SessionLog';
 import CampaignNotes from './components/CampaignNotes';
 
+/**
+ * Renders the Campaign page composed of a dashboard header, campaign details, session log, and notes.
+ *
+ * Displays a full-screen layout with a centered main container, a title/subtitle block, and a responsive grid
+ * where campaign information and session log occupy the main area and campaign notes appear in the sidebar.
+ *
+ * @returns The JSX element representing the Campaign page layout.
+ */
 export default function CampaignPage() {
   return (
     <div className="min-h-screen bg-gray-950">

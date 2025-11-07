@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Renders a document upload UI with file selection, category picker, and an upload button.
+ *
+ * The component provides a dashed dropzone that opens a file chooser accepting PDF, TXT, DOC, and DOCX files.
+ * When a file is selected, the first file is logged to the console and a placeholder exists for implementing the upload.
+ *
+ * @returns The component's JSX element containing the upload interface
+ */
 export default function DocumentUploader() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

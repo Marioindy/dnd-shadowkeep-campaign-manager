@@ -3,6 +3,11 @@ import DMMapViewer from './components/DMMapViewer';
 import MapUploader from './components/MapUploader';
 import FogOfWarControl from './components/FogOfWarControl';
 
+/**
+ * Renders the Map Control page with a header, map uploader, fog-of-war controls, and a map viewer arranged in a responsive two-column layout.
+ *
+ * @returns A JSX element representing the Map Control page layout.
+ */
 export default function MapControlPage() {
   return (
     <div className="min-h-screen bg-gray-950">

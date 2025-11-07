@@ -9,6 +9,13 @@ interface InitiativeEntry {
   type: 'player' | 'enemy';
 }
 
+/**
+ * Displays an interactive initiative tracker UI for a list of combatants.
+ *
+ * The component manages an internal list of combatants with initiative values, highlights the currently active combatant, and advances the turn order when the "Next Turn" button is clicked (wraps to the start after the last combatant). A non-functional "+ Add Combatant" control is rendered for future extension.
+ *
+ * @returns The rendered Initiative Tracker UI as a React element
+ */
 export default function InitiativeTracker() {
   const [entries, setEntries] = useState<InitiativeEntry[]>([
     { id: '1', name: 'Thaldrin', initiative: 18, type: 'player' },

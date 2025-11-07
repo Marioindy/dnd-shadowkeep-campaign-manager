@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * Render a presentational "Fog of War" control panel for map interactions.
+ *
+ * The panel includes four action buttons ("Draw Fog Area", "Reveal Area", "Hide All", "Reveal All")
+ * and a "Fog Opacity" range input. This component is purely presentational and does not manage state
+ * or attach event handlers to its controls.
+ *
+ * @returns A JSX element containing the fog-of-war controls panel.
+ */
 export default function FogOfWarControl() {
   return (
     <div className="bg-gray-900 rounded-lg p-4 border border-gray-800">

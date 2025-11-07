@@ -2,6 +2,13 @@
 
 import Link from 'next/link';
 
+/**
+ * Renders a card-style panel that lists player characters and provides navigation to create a new character or view a character's details.
+ *
+ * The list is currently populated with a hard-coded set of characters; each item shows name, level/race/class, an HP fraction, and a progress bar reflecting current HP. Each character and the "New Character" button link to their respective routes.
+ *
+ * @returns A React element containing the character overview UI.
+ */
 export default function CharacterOverview() {
   const characters = [
     { id: 1, name: 'Thaldrin Ironforge', race: 'Dwarf', class: 'Fighter', level: 5, hp: 42, maxHp: 52 },

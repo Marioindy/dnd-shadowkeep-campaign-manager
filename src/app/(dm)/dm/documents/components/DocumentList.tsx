@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Renders a static, styled list of documents with type badges, metadata, and action buttons.
+ *
+ * The list is produced from a predefined in-component array; the search input and action buttons
+ * are present for UI purposes but do not have attached handlers in this component.
+ *
+ * @returns The rendered documents list as a JSX element
+ */
 export default function DocumentList() {
   const documents = [
     { id: '1', name: 'Campaign Outline', type: 'PDF', size: '2.4 MB', uploadedAt: '2025-11-01' },

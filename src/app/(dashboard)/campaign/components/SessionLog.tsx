@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Render a static session history panel with session cards and a full-width "Add Session Notes" action.
+ *
+ * Renders a styled container titled "Session History" that lists hard-coded sessions (title, session number, date, and summary) as interactive cards and includes a dashed full-width button to add session notes.
+ *
+ * @returns The JSX for the session history panel containing the list of session cards and the add-session button.
+ */
 export default function SessionLog() {
   const sessions = [
     {

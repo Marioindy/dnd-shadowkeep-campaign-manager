@@ -1,5 +1,10 @@
 import LoginForm from './components/LoginForm';
 
+/**
+ * Renders the centered login page layout with a gradient background, the title "Shadowkeep", a subtitle, and the LoginForm component.
+ *
+ * @returns The page JSX element displaying the login interface.
+ */
 export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-4">

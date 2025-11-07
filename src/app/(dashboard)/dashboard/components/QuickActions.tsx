@@ -9,6 +9,11 @@ const actions = [
   { label: 'Campaign Notes', href: '/campaign', color: 'pink' },
 ];
 
+/**
+ * Renders a "Quick Actions" panel with one button-like link for each configured action.
+ *
+ * @returns A JSX element containing a titled container with link actions for navigation.
+ */
 export default function QuickActions() {
   return (
     <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">

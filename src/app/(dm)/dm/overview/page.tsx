@@ -3,6 +3,11 @@ import PartyOverview from './components/PartyOverview';
 import QuickStats from './components/QuickStats';
 import ActiveSession from './components/ActiveSession';
 
+/**
+ * Renders the DM Overview page composed of a header, page title/subtitle, and a responsive content grid that presents quick statistics, party details, and the active session panel.
+ *
+ * @returns The JSX element for the DM overview page.
+ */
 export default function DMOverviewPage() {
   return (
     <div className="min-h-screen bg-gray-950">

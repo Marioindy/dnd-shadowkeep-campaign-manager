@@ -1,3 +1,9 @@
+/**
+ * Renders a centered circular loading spinner whose dimensions vary by size.
+ *
+ * @param size - Spinner size; one of 'sm', 'md', or 'lg'. Defaults to 'md'.
+ * @returns A JSX element containing the centered spinner.
+ */
 export default function LoadingSpinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   const sizes = {
     sm: 'w-4 h-4',

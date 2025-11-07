@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Renders a styled panel showing a list of predefined campaign notes and a "+ New Note" action button.
+ *
+ * The panel displays each note as a clickable card with a title and truncated content.
+ *
+ * @returns A JSX element containing the campaign notes panel.
+ */
 export default function CampaignNotes() {
   const notes = [
     { id: '1', title: 'Important NPCs', content: 'Lord Blackwood, Merchant Gilda, Sage Orion' },

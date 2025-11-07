@@ -3,6 +3,13 @@
 import Link from 'next/link';
 import CharacterCard from './CharacterCard';
 
+/**
+ * Displays a responsive grid of character cards with a right-aligned "Create New Character" action.
+ *
+ * Renders a top-aligned link to create a new character and a responsive grid (1/2/3 columns) of sample characters.
+ *
+ * @returns The component's JSX representing the character list and create action.
+ */
 export default function CharacterList() {
   const characters = [
     {

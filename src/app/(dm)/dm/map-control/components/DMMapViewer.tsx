@@ -2,6 +2,15 @@
 
 import { useState } from 'react';
 
+/**
+ * Render a DM-facing map viewer UI with controls for grid, markers, and fog of war.
+ *
+ * The component manages local UI state for showing the grid, markers, and fog (all enabled by default)
+ * and presents a placeholder main view when no map is loaded. Header controls toggle the corresponding state,
+ * and the footer exposes DM action buttons and usage hints.
+ *
+ * @returns The rendered JSX element for the DM map viewer.
+ */
 export default function DMMapViewer() {
   const [showGrid, setShowGrid] = useState(true);
   const [showMarkers, setShowMarkers] = useState(true);

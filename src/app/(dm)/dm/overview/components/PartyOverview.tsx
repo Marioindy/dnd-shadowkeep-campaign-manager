@@ -1,5 +1,12 @@
 'use client';
 
+/**
+ * Renders a party overview panel showing each character's name, level/class, status, and HP bar.
+ *
+ * The component uses static internal data to render one card per party member. Each card includes a colored status dot, a "View" button, numeric HP (current/max), and a progress bar whose width and color reflect the HP ratio.
+ *
+ * @returns A React element containing the party overview UI.
+ */
 export default function PartyOverview() {
   const party = [
     { id: '1', name: 'Thaldrin Ironforge', class: 'Fighter', level: 5, hp: 42, maxHp: 52, status: 'healthy' },

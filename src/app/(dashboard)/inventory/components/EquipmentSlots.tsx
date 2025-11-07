@@ -1,5 +1,13 @@
 'use client';
 
+/**
+ * Render a styled equipment panel listing character equipment slots and their current items.
+ *
+ * Each slot shows its label and either the equipped item's name or an "Empty" placeholder,
+ * with visual styling that differs for occupied versus vacant slots.
+ *
+ * @returns A JSX element containing the equipment panel with individual slot entries.
+ */
 export default function EquipmentSlots() {
   const slots = [
     { id: 'head', label: 'Head', equipped: null },

@@ -18,6 +18,14 @@ interface CharacterCardProps {
   };
 }
 
+/**
+ * Render a clickable character card linking to the character detail page.
+ *
+ * Renders the character's name, level, race, class, a circular level badge, a health bar whose width and color reflect current HP, and blocks for Armor Class and Speed.
+ *
+ * @param character - The character data to render (must include `id`, `name`, `race`, `class`, `level`, and `stats` with `hp`, `maxHp`, `ac`, and `speed`)
+ * @returns A styled link card showing the character's details, current health visualization, and basic stats
+ */
 export default function CharacterCard({ character }: CharacterCardProps) {
   const hpPercentage = (character.stats.hp / character.stats.maxHp) * 100;
 
