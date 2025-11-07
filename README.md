@@ -181,40 +181,28 @@ src/app/(dashboard)/new-feature/
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
+For detailed setup instructions, see [SETUP.md](SETUP.md).
 
-### Installation
+### Quick Start
 
-1. Clone the repository
+1. Clone the repository and install dependencies
 ```bash
 git clone https://github.com/yourusername/dnd-shadowkeep-campaign-manager.git
 cd dnd-shadowkeep-campaign-manager
-```
-
-2. Install dependencies
-```bash
 npm install
 ```
 
-3. Set up environment variables
-```bash
-cp .env.example .env.local
-```
-
-4. Initialize Convex (first time only)
+2. Initialize Convex (creates your backend)
 ```bash
 npx convex dev
 ```
-Follow the prompts to create a Convex account and project.
 
-5. Run the development server
+3. Start the development server (in a new terminal)
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000)
+4. Open [http://localhost:3000](http://localhost:3000)
 
 ### Building for Production
 
@@ -241,26 +229,29 @@ Global TypeScript types are in `src/types/index.ts`. Update this file when addin
 
 ## Authentication
 
-Currently implements a **closed-door system**:
+Implements a **closed-door system**:
 - No public registration
-- DM/Admin manually creates user accounts
-- Session-based authentication (to be implemented with Convex auth)
+- DM/Admin manually creates user accounts via Convex mutations
+- Session management with localStorage and React Context
+- Password hashing for secure credential storage (basic implementation - will be enhanced in Phase 2)
 
 ## Roadmap
 
-### Phase 1 (Current)
+### Phase 1 ✅ Complete
 - ✅ Project structure setup
 - ✅ Core page layouts
 - ✅ Component architecture
-- ⬜ Convex integration
-- ⬜ Authentication system
-- ⬜ Real-time data sync
+- ✅ Convex integration
+- ✅ Authentication system
+- ✅ Real-time data sync
 
-### Phase 2
+### Phase 2 (Current)
+- ⬜ Enhanced authentication (OAuth, password reset)
 - ⬜ GSAP animations for maps
 - ⬜ Drag-and-drop inventory
 - ⬜ Advanced dice rolling with physics
 - ⬜ Audio/ambient sound integration
+- ⬜ File upload for maps and documents
 
 ### Phase 3
 - ⬜ Mobile app version
