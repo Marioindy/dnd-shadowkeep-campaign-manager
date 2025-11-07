@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import clsx from 'clsx';
 
 const actions = [
   { label: 'Create Character', href: '/characters/new', color: 'purple' },
@@ -8,6 +9,14 @@ const actions = [
   { label: 'Session Tools', href: '/session-tools', color: 'green' },
   { label: 'Campaign Notes', href: '/campaign', color: 'pink' },
 ];
+
+const colorClasses = {
+  purple: 'bg-purple-600 hover:bg-purple-700',
+  blue: 'bg-blue-600 hover:bg-blue-700',
+  green: 'bg-green-600 hover:bg-green-700',
+  pink: 'bg-pink-600 hover:bg-pink-700',
+  default: 'bg-gray-600 hover:bg-gray-700',
+} as const;
 
 /**
  * Renders a "Quick Actions" panel with one button-like link for each configured action.
@@ -23,7 +32,10 @@ export default function QuickActions() {
           <Link
             key={action.label}
             href={action.href}
-            className={`block w-full px-4 py-3 bg-${action.color}-600 hover:bg-${action.color}-700 rounded-lg text-center font-medium transition-colors`}
+            className={clsx(
+              colorClasses[action.color as keyof typeof colorClasses] ?? colorClasses.default,
+              'block w-full px-4 py-3 rounded-lg text-center font-medium transition-colors'
+            )}
           >
             {action.label}
           </Link>
