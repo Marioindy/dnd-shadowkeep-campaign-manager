@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { rollDice } from '@/lib/utils';
 
 /**
  * Renders a Dice Roller interface with buttons for common dice; clicking a die generates a roll, displays the numeric result, and prepends a recent-roll entry (keeps up to 4 items).
@@ -13,8 +14,8 @@ export default function DiceRoller() {
 
   const diceTypes = [4, 6, 8, 10, 12, 20, 100];
 
-  const rollDice = (sides: number) => {
-    const rolled = Math.floor(Math.random() * sides) + 1;
+  const handleRoll = (sides: number) => {
+    const rolled = rollDice(sides);
     setResult(rolled);
     setHistory([{ roll: `d${sides}`, result: rolled }, ...history.slice(0, 4)]);
   };
@@ -34,7 +35,7 @@ export default function DiceRoller() {
         {diceTypes.map((sides) => (
           <button
             key={sides}
-            onClick={() => rollDice(sides)}
+            onClick={() => handleRoll(sides)}
             className="bg-gray-800 hover:bg-purple-600 rounded-lg p-4 transition-colors"
           >
             <p className="text-2xl font-bold text-white">d{sides}</p>
