@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+interface PlayerListProps {
+  selectedPlayer: string;
+  onSelectPlayer: (playerId: string) => void;
+}
 
 /**
  * Renders a selectable list of players with usernames, character names, and online indicators.
  *
- * Displays each player as a button that updates internal selection state when clicked and provides an action button to add a player.
+ * A controlled component that displays each player as a button and emits selection changes via the onSelectPlayer callback.
  *
+ * @param selectedPlayer - The currently selected player ID
+ * @param onSelectPlayer - Callback function invoked when a player is selected
  * @returns The component's root JSX element containing the player list and add-player control.
  */
-export default function PlayerList() {
-  const [selectedPlayer, setSelectedPlayer] = useState('1');
+export default function PlayerList({ selectedPlayer, onSelectPlayer }: PlayerListProps) {
 
   const players = [
     { id: '1', username: 'player1', characterName: 'Thaldrin Ironforge', online: true },
@@ -27,7 +31,7 @@ export default function PlayerList() {
         {players.map((player) => (
           <button
             key={player.id}
-            onClick={() => setSelectedPlayer(player.id)}
+            onClick={() => onSelectPlayer(player.id)}
             className={`w-full text-left p-3 rounded-lg transition-all ${
               selectedPlayer === player.id
                 ? 'bg-red-600 text-white'
