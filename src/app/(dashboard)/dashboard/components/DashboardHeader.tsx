@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 
 /**
  * Header bar for the dashboard that displays branding, navigation, and user controls.
@@ -11,7 +10,7 @@ import { useState } from 'react';
  * @returns The header React element for the dashboard layout.
  */
 export default function DashboardHeader() {
-  const [user] = useState({ username: 'Player', role: 'player' });
+  const user = { username: 'Player', role: 'player' };
 
   return (
     <header className="bg-gray-900 border-b border-gray-800">
