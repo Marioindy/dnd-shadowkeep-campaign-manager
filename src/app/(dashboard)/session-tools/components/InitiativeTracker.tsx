@@ -6,7 +6,7 @@ import { InitiativeEntry } from '@/types';
 /**
  * Displays an interactive initiative tracker UI for a list of combatants.
  *
- * The component manages an internal list of combatants with initiative values, highlights the currently active combatant, and advances the turn order when the "Next Turn" button is clicked (wraps to the start after the last combatant). A non-functional "+ Add Combatant" control is rendered for future extension.
+ * The component manages an internal list of combatants with initiative values, highlights the currently active combatant, and advances the turn order when the "Next Turn" button is clicked (wraps to the start after the last combatant). Users can add new combatants through an inline form.
  *
  * @returns The rendered Initiative Tracker UI as a React element
  */
@@ -18,11 +18,39 @@ export default function InitiativeTracker() {
     { id: '4', name: 'Goblin 2', initiative: 8, type: 'enemy' },
   ]);
   const [currentTurn, setCurrentTurn] = useState(0);
+  const [isAddingCombatant, setIsAddingCombatant] = useState(false);
+  const [newCombatant, setNewCombatant] = useState({
+    name: '',
+    initiative: '',
+    type: 'player' as 'player' | 'enemy',
+  });
 
   const sortedEntries = [...entries].sort((a, b) => b.initiative - a.initiative);
 
   const nextTurn = () => {
     setCurrentTurn((prev) => (prev + 1) % sortedEntries.length);
+  };
+
+  const handleAddCombatant = () => {
+    if (newCombatant.name.trim() && newCombatant.initiative) {
+      const initiative = parseInt(newCombatant.initiative, 10);
+      if (!isNaN(initiative)) {
+        const newEntry: InitiativeEntry = {
+          id: Date.now().toString(),
+          name: newCombatant.name.trim(),
+          initiative,
+          type: newCombatant.type,
+        };
+        setEntries([...entries, newEntry]);
+        setNewCombatant({ name: '', initiative: '', type: 'player' });
+        setIsAddingCombatant(false);
+      }
+    }
+  };
+
+  const handleCancelAdd = () => {
+    setNewCombatant({ name: '', initiative: '', type: 'player' });
+    setIsAddingCombatant(false);
   };
 
   return (
@@ -72,9 +100,74 @@ export default function InitiativeTracker() {
         ))}
       </div>
 
-      <button className="w-full py-2 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-colors text-sm">
-        + Add Combatant
-      </button>
+      {!isAddingCombatant ? (
+        <button
+          onClick={() => setIsAddingCombatant(true)}
+          className="w-full py-2 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-colors text-sm"
+        >
+          + Add Combatant
+        </button>
+      ) : (
+        <div className="bg-gray-800 rounded-lg p-4 border-2 border-purple-500">
+          <h3 className="text-white font-medium mb-3">Add New Combatant</h3>
+          <div className="space-y-3">
+            <div>
+              <label htmlFor="combatant-name" className="block text-sm text-gray-400 mb-1">
+                Name
+              </label>
+              <input
+                id="combatant-name"
+                type="text"
+                value={newCombatant.name}
+                onChange={(e) => setNewCombatant({ ...newCombatant, name: e.target.value })}
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                placeholder="Enter combatant name"
+              />
+            </div>
+            <div>
+              <label htmlFor="combatant-initiative" className="block text-sm text-gray-400 mb-1">
+                Initiative
+              </label>
+              <input
+                id="combatant-initiative"
+                type="number"
+                value={newCombatant.initiative}
+                onChange={(e) => setNewCombatant({ ...newCombatant, initiative: e.target.value })}
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+                placeholder="Enter initiative value"
+              />
+            </div>
+            <div>
+              <label htmlFor="combatant-type" className="block text-sm text-gray-400 mb-1">
+                Type
+              </label>
+              <select
+                id="combatant-type"
+                value={newCombatant.type}
+                onChange={(e) => setNewCombatant({ ...newCombatant, type: e.target.value as 'player' | 'enemy' })}
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-purple-500"
+              >
+                <option value="player">Player</option>
+                <option value="enemy">Enemy</option>
+              </select>
+            </div>
+            <div className="flex space-x-2 mt-4">
+              <button
+                onClick={handleAddCombatant}
+                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"
+              >
+                Add
+              </button>
+              <button
+                onClick={handleCancelAdd}
+                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
