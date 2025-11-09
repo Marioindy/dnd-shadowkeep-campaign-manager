@@ -1,13 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
-interface InitiativeEntry {
-  id: string;
-  name: string;
-  initiative: number;
-  type: 'player' | 'enemy';
-}
+import { InitiativeEntry } from '@/types';
 
 /**
  * Displays an interactive initiative tracker UI for a list of combatants.
@@ -56,7 +50,7 @@ export default function InitiativeTracker() {
             <div className="flex items-center space-x-3">
               <span
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  entry.type === 'player' ? 'bg-blue-500' : 'bg-red-500'
+                  entry.type === 'player' ? 'bg-blue-500' : entry.type === 'npc' ? 'bg-green-500' : 'bg-red-500'
                 }`}
               >
                 {entry.initiative}
@@ -67,6 +61,8 @@ export default function InitiativeTracker() {
               className={`text-xs px-2 py-1 rounded ${
                 entry.type === 'player'
                   ? 'bg-blue-500/20 text-blue-400'
+                  : entry.type === 'npc'
+                  ? 'bg-green-500/20 text-green-400'
                   : 'bg-red-500/20 text-red-400'
               }`}
             >
