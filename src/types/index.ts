@@ -100,16 +100,31 @@ export interface Campaign {
 }
 
 // Session Types
-export interface Session {
+// Database type - matches Convex schema
+export interface SessionDB {
   _id: string;
   campaignId: string;
   name: string;
   date: number;
   notes: string;
-  encounters: Encounter[];
   active: boolean;
 }
 
+// Composed view type - includes encounters from separate table
+export interface Session extends SessionDB {
+  encounters: Encounter[];
+}
+
+// Database type - matches Convex schema
+export interface EncounterDB {
+  _id: string;
+  sessionId: string;
+  name: string;
+  enemies: Enemy[];
+  initiative: InitiativeEntry[];
+}
+
+// View type - same as DB but without sessionId (implied by parent session)
 export interface Encounter {
   id: string;
   name: string;

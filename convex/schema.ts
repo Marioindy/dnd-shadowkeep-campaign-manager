@@ -96,4 +96,27 @@ export default defineSchema({
     notes: v.string(),
     active: v.boolean(),
   }).index('by_campaign', ['campaignId']),
+
+  encounters: defineTable({
+    sessionId: v.id('sessions'),
+    name: v.string(),
+    enemies: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        hp: v.number(),
+        maxHp: v.number(),
+        ac: v.number(),
+        initiativeBonus: v.number(),
+      })
+    ),
+    initiative: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        initiative: v.number(),
+        type: v.union(v.literal('player'), v.literal('enemy'), v.literal('npc')),
+      })
+    ),
+  }).index('by_session', ['sessionId']),
 });
