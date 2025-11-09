@@ -30,7 +30,7 @@ A real-time, collaborative tabletop RPG management platform for Dungeons & Drago
 
 ## Project Structure
 
-```
+```text
 dnd-shadowkeep-campaign-manager/
 ├── src/
 │   ├── app/                          # Next.js App Router pages
