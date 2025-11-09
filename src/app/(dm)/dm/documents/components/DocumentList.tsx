@@ -1,14 +1,43 @@
 'use client';
 
 /**
+ * Document item structure
+ */
+interface Document {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  uploadedAt: string;
+}
+
+/**
+ * Props for the DocumentList component
+ */
+interface DocumentListProps {
+  /**
+   * Optional callback when a document is viewed
+   * If not provided, the View button will be disabled
+   */
+  onView?: (document: Document) => void;
+  /**
+   * Optional callback when a document is deleted
+   * If not provided, the Delete button will be disabled
+   */
+  onDelete?: (document: Document) => void;
+}
+
+/**
  * Renders a static, styled list of documents with type badges, metadata, and action buttons.
  *
- * The list is produced from a predefined in-component array; the search input and action buttons
- * are present for UI purposes but do not have attached handlers in this component.
+ * The list is produced from a predefined in-component array; the search input is present for UI purposes.
+ * Action buttons (View/Delete) accept optional handler props - if not provided, they will be disabled
+ * with tooltips indicating they are awaiting backend integration.
  *
+ * @param props - Component props containing optional onView and onDelete handlers
  * @returns The rendered documents list as a JSX element
  */
-export default function DocumentList() {
+export default function DocumentList({ onView, onDelete }: DocumentListProps = {}) {
   const documents = [
     { id: '1', name: 'Campaign Outline', type: 'PDF', size: '2.4 MB', uploadedAt: '2025-11-01' },
     { id: '2', name: 'NPC Roster', type: 'PDF', size: '1.8 MB', uploadedAt: '2025-10-28' },
@@ -59,10 +88,30 @@ export default function DocumentList() {
               </div>
             </div>
             <div className="flex space-x-2">
-              <button className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition-colors">
+              <button
+                onClick={() => onView?.(doc)}
+                disabled={!onView}
+                aria-disabled={!onView}
+                title={!onView ? 'View functionality pending backend integration' : 'View document'}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  onView
+                    ? 'bg-gray-700 hover:bg-gray-600 cursor-pointer'
+                    : 'bg-gray-700/50 text-gray-500 cursor-not-allowed opacity-60'
+                }`}
+              >
                 View
               </button>
-              <button className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition-colors">
+              <button
+                onClick={() => onDelete?.(doc)}
+                disabled={!onDelete}
+                aria-disabled={!onDelete}
+                title={!onDelete ? 'Delete functionality pending backend integration' : 'Delete document'}
+                className={`px-3 py-1 rounded text-sm transition-colors ${
+                  onDelete
+                    ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                    : 'bg-red-600/50 text-red-400/50 cursor-not-allowed opacity-60'
+                }`}
+              >
                 Delete
               </button>
             </div>
