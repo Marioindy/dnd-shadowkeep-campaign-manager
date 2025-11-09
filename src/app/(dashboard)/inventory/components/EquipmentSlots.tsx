@@ -26,11 +26,15 @@ export default function EquipmentSlots() {
         {slots.map((slot) => (
           <div
             key={slot.id}
+            onClick={() => console.log('Slot clicked:', slot.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && console.log('Slot activated:', slot.id)}
             className={`rounded-lg p-4 border-2 transition-all ${
               slot.equipped
                 ? 'bg-gray-800 border-purple-500'
                 : 'bg-gray-800/50 border-dashed border-gray-700'
-            }`}
+            } cursor-pointer hover:border-purple-400`}
           >
             <p className="text-xs text-gray-400 mb-1">{slot.label}</p>
             {slot.equipped ? (
