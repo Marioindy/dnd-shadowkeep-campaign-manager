@@ -11,13 +11,12 @@ export interface User {
 export interface Character {
   _id: string;
   userId: string;
+  campaignId: string;
   name: string;
   race: string;
   class: string;
   level: number;
   stats: CharacterStats;
-  inventory: InventoryItem[];
-  equipment: Equipment;
   portraitUrl?: string;
   backstory?: string;
   createdAt: number;
@@ -39,13 +38,16 @@ export interface CharacterStats {
 
 // Inventory Types
 export interface InventoryItem {
-  id: string;
+  _id: string;
+  characterId: string;
   name: string;
   type: 'weapon' | 'armor' | 'potion' | 'tool' | 'misc';
   quantity: number;
   weight: number;
   description?: string;
   properties?: Record<string, any>;
+  equipped?: boolean;
+  equipSlot?: string;
 }
 
 export interface Equipment {
