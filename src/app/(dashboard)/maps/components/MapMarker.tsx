@@ -1,14 +1,9 @@
 'use client';
 
+import { MapMarker as MapMarkerType } from '@/types';
+
 interface MapMarkerProps {
-  marker: {
-    id: string;
-    x: number;
-    y: number;
-    type: string;
-    label?: string;
-    color?: string;
-  };
+  marker: MapMarkerType;
 }
 
 /**
@@ -16,7 +11,7 @@ interface MapMarkerProps {
  *
  * Displays a colored circular badge centered at (marker.x, marker.y). The badge shows the first character of `marker.label` or `'?'` when no label is provided; if `marker.label` is present, the full label appears in a non-interactive tooltip on hover.
  *
- * @param marker - Marker data: `id` (string), `x` and `y` (coordinates used for CSS `left`/`top`), `type` (string), optional `label` (string) and optional `color` (CSS color string)
+ * @param marker - Marker data conforming to the shared MapMarker type with fields: `id` (string), `type` ('player'|'npc'|'enemy'|'poi'), `x` and `y` (coordinates), `visible` (boolean), optional `label`, `color`, and `iconUrl`
  * @returns A JSX element that visually represents the positioned map marker and its tooltip
  */
 export default function MapMarker({ marker }: MapMarkerProps) {

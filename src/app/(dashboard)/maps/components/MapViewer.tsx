@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import MapMarkerComponent from './MapMarker';
+import { MapMarker } from '@/types';
 
 /**
  * Renders an interactive map viewer with draggable panning, zoom controls, and markers.
@@ -15,10 +16,10 @@ import MapMarkerComponent from './MapMarker';
  */
 export default function MapViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [markers, setMarkers] = useState([
-    { id: '1', x: 100, y: 150, type: 'player', label: 'Thaldrin', color: '#8b5cf6' },
-    { id: '2', x: 200, y: 180, type: 'player', label: 'Lyra', color: '#ec4899' },
-    { id: '3', x: 350, y: 120, type: 'enemy', label: 'Goblin', color: '#ef4444' },
+  const [markers, setMarkers] = useState<MapMarker[]>([
+    { id: '1', x: 100, y: 150, type: 'player', label: 'Thaldrin', color: '#8b5cf6', visible: true },
+    { id: '2', x: 200, y: 180, type: 'player', label: 'Lyra', color: '#ec4899', visible: true },
+    { id: '3', x: 350, y: 120, type: 'enemy', label: 'Goblin', color: '#ef4444', visible: true },
   ]);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
