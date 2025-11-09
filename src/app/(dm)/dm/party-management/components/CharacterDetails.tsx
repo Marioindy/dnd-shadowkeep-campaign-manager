@@ -1,14 +1,19 @@
 'use client';
 
+interface CharacterDetailsProps {
+  selectedPlayer: string;
+}
+
 /**
  * Render a detailed profile card for a D&D-style character.
  *
  * The component displays the character's name, level, race, and class; a grid of ability scores
  * with D&D-style modifiers; summary cards for health, armor class, and speed; and an inventory list.
  *
+ * @param selectedPlayer - The ID of the currently selected player
  * @returns A JSX element rendering the full character details view (header, stats grid, summaries, and inventory).
  */
-export default function CharacterDetails() {
+export default function CharacterDetails({ selectedPlayer }: CharacterDetailsProps) {
   const character = {
     name: 'Thaldrin Ironforge',
     race: 'Dwarf',
