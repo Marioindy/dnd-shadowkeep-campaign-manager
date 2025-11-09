@@ -1,5 +1,7 @@
 'use client';
 
+import { calculateModifier, formatModifier } from '@/lib/utils';
+
 interface StatBlockProps {
   label: string;
   value: number;
@@ -9,7 +11,7 @@ interface StatBlockProps {
 /**
  * Renders a centered stat block showing a label, a numeric value, and a formatted modifier.
  *
- * If `modifier` is omitted, the modifier is derived as Math.floor((value - 10) / 2).
+ * If `modifier` is omitted, the modifier is calculated using calculateModifier(value).
  *
  * @param label - Short descriptor shown above the value
  * @param value - Numeric stat value to display
@@ -17,8 +19,8 @@ interface StatBlockProps {
  * @returns The JSX element for the stat block containing the label, value, and formatted modifier
  */
 export default function StatBlock({ label, value, modifier }: StatBlockProps) {
-  const calculatedModifier = modifier ?? Math.floor((value - 10) / 2);
-  const modifierString = calculatedModifier >= 0 ? `+${calculatedModifier}` : `${calculatedModifier}`;
+  const calculatedModifier = modifier ?? calculateModifier(value);
+  const modifierString = formatModifier(calculatedModifier);
 
   return (
     <div className="bg-gray-800 rounded-lg p-4 text-center border border-gray-700">
