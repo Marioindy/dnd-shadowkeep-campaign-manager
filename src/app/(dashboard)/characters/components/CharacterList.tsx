@@ -1,56 +1,46 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useQuery } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import CharacterCard from './CharacterCard';
+import type { Id } from '../../../../../convex/_generated/dataModel';
 
 /**
  * Displays a responsive grid of character cards with a right-aligned "Create New Character" action.
  *
- * Renders a top-aligned link to create a new character and a responsive grid (1/2/3 columns) of sample characters.
+ * Fetches characters from Convex backend in real-time for the current user.
+ * Shows loading state while fetching and empty state when no characters exist.
  *
  * @returns The component's JSX representing the character list and create action.
  */
 export default function CharacterList() {
-  const characters = [
-    {
-      id: '1',
-      name: 'Thaldrin Ironforge',
-      race: 'Dwarf',
-      class: 'Fighter',
-      level: 5,
-      stats: {
-        strength: 18,
-        dexterity: 12,
-        constitution: 16,
-        intelligence: 10,
-        wisdom: 13,
-        charisma: 8,
-        hp: 42,
-        maxHp: 52,
-        ac: 18,
-        speed: 25,
-      },
-    },
-    {
-      id: '2',
-      name: 'Lyra Moonshadow',
-      race: 'Elf',
-      class: 'Wizard',
-      level: 5,
-      stats: {
-        strength: 8,
-        dexterity: 14,
-        constitution: 12,
-        intelligence: 18,
-        wisdom: 15,
-        charisma: 11,
-        hp: 28,
-        maxHp: 30,
-        ac: 13,
-        speed: 30,
-      },
-    },
-  ];
+  const [userId, setUserId] = useState<Id<'users'> | null>(null);
+
+  // Get user ID from localStorage
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      setUserId(user._id);
+    }
+  }, []);
+
+  // Fetch characters for the current user with real-time updates
+  const characters = useQuery(
+    api.characters.byUser,
+    userId ? { userId } : 'skip'
+  );
+
+  // Show loading state
+  if (characters === undefined) {
+    return (
+      <div className="flex justify-center items-center py-16">
+        <div className="text-gray-400">Loading characters...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -63,7 +53,7 @@ export default function CharacterList() {
         </Link>
       </div>
 
-      {characters.length === 0 ? (
+      {!characters || characters.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-16 px-6 text-center"
           role="region"

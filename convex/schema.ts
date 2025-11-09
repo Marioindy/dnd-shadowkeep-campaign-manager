@@ -95,5 +95,42 @@ export default defineSchema({
     date: v.number(),
     notes: v.string(),
     active: v.boolean(),
+    encounters: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          name: v.string(),
+          enemies: v.array(
+            v.object({
+              id: v.string(),
+              name: v.string(),
+              hp: v.number(),
+              maxHp: v.number(),
+              ac: v.number(),
+              initiativeBonus: v.number(),
+            })
+          ),
+          initiative: v.array(
+            v.object({
+              id: v.string(),
+              name: v.string(),
+              initiative: v.number(),
+              type: v.union(v.literal('player'), v.literal('enemy'), v.literal('npc')),
+            })
+          ),
+        })
+      )
+    ),
   }).index('by_campaign', ['campaignId']),
+
+  fogOfWar: defineTable({
+    mapId: v.id('maps'),
+    points: v.array(
+      v.object({
+        x: v.number(),
+        y: v.number(),
+      })
+    ),
+    revealed: v.boolean(),
+  }).index('by_map', ['mapId']),
 });

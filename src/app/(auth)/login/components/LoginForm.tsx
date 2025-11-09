@@ -2,16 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMutation } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 
 /**
  * Renders a login form for collecting username and password, manages loading and error states, and navigates to the dashboard on successful submission.
  *
- * The form disables the submit button while a submission is in progress and displays an error message when authentication fails.
+ * Uses Convex authentication for real-time user verification.
+ * Stores user data in localStorage for session management.
  *
  * @returns The rendered login form as a JSX element.
  */
 export default function LoginForm() {
   const router = useRouter();
+  const login = useMutation(api.auth.login);
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -25,12 +30,14 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement Convex authentication
-      // const response = await convex.mutation(api.auth.login, formData);
+      // Authenticate with Convex backend
+      const user = await login({
+        username: formData.username,
+        password: formData.password,
+      });
 
-      // Temporary mock login
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Store user data in localStorage for session management
+      localStorage.setItem('user', JSON.stringify(user));
 
       // Redirect to dashboard
       router.push('/dashboard');

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Providers } from '@/components/Providers';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
@@ -8,9 +9,10 @@ export const metadata: Metadata = {
 
 /**
  * Provides the root HTML layout for the application and renders `children` inside the document body.
+ * Wraps the application with client-side providers (Convex for real-time sync).
  *
  * @param children - The React nodes to render inside the page's <body>.
- * @returns The root `<html>` element containing a `<body>` that wraps `children`.
+ * @returns The root `<html>` element containing a `<body>` that wraps `children` with providers.
  */
 export default function RootLayout({
   children,
@@ -19,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
