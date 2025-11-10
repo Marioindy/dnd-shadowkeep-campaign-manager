@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { InitiativeEntry } from '@/types';
+import { audioManager } from '@/lib/audioManager';
 
 /**
  * Displays an interactive initiative tracker UI for a list of combatants.
  *
  * The component manages an internal list of combatants with initiative values, highlights the currently active combatant, and advances the turn order when the "Next Turn" button is clicked (wraps to the start after the last combatant). Users can add new combatants through an inline form.
+ * Includes audio feedback for turn changes and combat events.
  *
  * @returns The rendered Initiative Tracker UI as a React element
  */
@@ -19,6 +21,7 @@ export default function InitiativeTracker() {
   ]);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isAddingCombatant, setIsAddingCombatant] = useState(false);
+  const [combatStarted, setCombatStarted] = useState(false);
   const [newCombatant, setNewCombatant] = useState({
     name: '',
     initiative: '',
@@ -27,8 +30,30 @@ export default function InitiativeTracker() {
 
   const sortedEntries = [...entries].sort((a, b) => b.initiative - a.initiative);
 
+  // Play combat start sound on first mount
+  useEffect(() => {
+    if (!combatStarted && sortedEntries.length > 0) {
+      audioManager.playSoundEffect('initiative_start');
+      setCombatStarted(true);
+    }
+  }, [combatStarted, sortedEntries.length]);
+
   const nextTurn = () => {
-    setCurrentTurn((prev) => (prev + 1) % sortedEntries.length);
+    setCurrentTurn((prev) => {
+      const nextTurnIndex = (prev + 1) % sortedEntries.length;
+
+      // Play turn change sound
+      audioManager.playSoundEffect('initiative_next_turn');
+
+      // If wrapping back to first turn, play combat start sound
+      if (nextTurnIndex === 0) {
+        setTimeout(() => {
+          audioManager.playSoundEffect('initiative_start', { volume: 0.7 });
+        }, 300);
+      }
+
+      return nextTurnIndex;
+    });
   };
 
   const handleAddCombatant = () => {
@@ -44,6 +69,9 @@ export default function InitiativeTracker() {
         setEntries([...entries, newEntry]);
         setNewCombatant({ name: '', initiative: '', type: 'player' });
         setIsAddingCombatant(false);
+
+        // Play sound when adding combatant
+        audioManager.playSoundEffect('combatant_added');
       }
     }
   };

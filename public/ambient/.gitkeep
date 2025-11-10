@@ -1,0 +1,33 @@
+# Ambient Music Directory
+
+This directory contains ambient background music files for the D&D Campaign Manager.
+
+## Required Ambient Track Files
+
+Place the following MP3 files in this directory:
+
+- tavern.mp3 - Tavern/inn atmosphere
+- town.mp3 - Town/city atmosphere
+- peaceful.mp3 - Peaceful/calm atmosphere
+- forest.mp3 - Forest/wilderness atmosphere
+- dungeon.mp3 - Dungeon/underground atmosphere
+- cave.mp3 - Cave atmosphere
+- mystical.mp3 - Mystical/magical atmosphere
+- combat.mp3 - Combat music (general)
+- boss-battle.mp3 - Epic boss battle music
+
+## Recommendations
+
+- Use loopable tracks (seamless loops)
+- Keep file sizes reasonable (consider compressed MP3 format)
+- Typical length: 2-5 minutes per track
+- Volume: Normalize to consistent levels
+
+## Recommended Sources
+
+You can find royalty-free ambient music at:
+- Incompetech.com (Kevin MacLeod)
+- Purple Planet Music
+- Bensound.com
+- Tabletop Audio
+- YouTube Audio Library

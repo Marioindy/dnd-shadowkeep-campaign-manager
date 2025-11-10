@@ -2,9 +2,10 @@ import DMHeader from '../components/DMHeader';
 import PartyOverview from './components/PartyOverview';
 import QuickStats from './components/QuickStats';
 import ActiveSession from './components/ActiveSession';
+import AmbientMusicSelector from '@/components/audio/AmbientMusicSelector';
 
 /**
- * Renders the DM Overview page composed of a header, page title/subtitle, and a responsive content grid that presents quick statistics, party details, and the active session panel.
+ * Renders the DM Overview page composed of a header, page title/subtitle, and a responsive content grid that presents quick statistics, party details, active session panel, and ambient music controls.
  *
  * @returns The JSX element for the DM overview page.
  */
@@ -24,8 +25,9 @@ export default function DMOverviewPage() {
             <QuickStats />
             <PartyOverview />
           </div>
-          <div>
+          <div className="space-y-6">
             <ActiveSession />
+            <AmbientMusicSelector />
           </div>
         </div>
       </main>
