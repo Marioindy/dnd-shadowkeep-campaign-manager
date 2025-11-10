@@ -1,6 +1,6 @@
 'use client';
 
-import { InventoryItem } from '@/types';
+import type { InventoryItem } from '@/types';
 
 interface InventoryItemProps {
   item: InventoryItem;

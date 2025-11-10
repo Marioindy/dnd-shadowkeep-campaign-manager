@@ -69,8 +69,9 @@ export interface Map {
 }
 
 export interface MapMarker {
-  _id: string;
-  mapId: string;
+  _id?: string;
+  id?: string;
+  mapId?: string;
   type: 'player' | 'npc' | 'enemy' | 'poi';
   x: number;
   y: number;
@@ -139,4 +140,45 @@ export interface InitiativeEntry {
   name: string;
   initiative: number;
   type: 'player' | 'enemy' | 'npc';
+}
+
+// Dice Roll Types
+export type DiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100';
+export type RollType = 'normal' | 'advantage' | 'disadvantage';
+
+export interface DiceRoll {
+  _id: string;
+  sessionId?: string;
+  userId: string;
+  characterName?: string;
+  diceType: string;
+  diceCount: number;
+  modifier: number;
+  rollType: RollType;
+  results: number[];
+  total: number;
+  timestamp: number;
+  purpose?: string;
+  targetDC?: number;
+  success?: boolean;
+}
+
+export interface DiceRollStats {
+  totalRolls: number;
+  totalDice: number;
+  averageRoll: number;
+  highestRoll: number;
+  lowestRoll: number;
+  criticalHits: number;
+  criticalFails: number;
+  rollsByType: Record<string, number>;
+}
+
+export interface RollRequest {
+  diceType: DiceType;
+  diceCount: number;
+  modifier: number;
+  rollType: RollType;
+  purpose?: string;
+  targetDC?: number;
 }
