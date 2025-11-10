@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 /**
  * Renders a login form for collecting username and password, manages loading and error states, and navigates to the dashboard on successful submission.
@@ -12,6 +13,7 @@ import { useRouter } from 'next/navigation';
  */
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -25,14 +27,8 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement Convex authentication
-      // const response = await convex.mutation(api.auth.login, formData);
-
-      // Temporary mock login
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Redirect to dashboard
+      await login(formData.username, formData.password);
+      // Redirect to dashboard on successful login
       router.push('/dashboard');
     } catch (err) {
       setError('Invalid credentials. Please try again.');

@@ -1,25 +1,36 @@
 'use client';
 
 import InventoryItem from './InventoryItem';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCharactersByUser } from '@/hooks/useCharacters';
+import { useInventory } from '@/hooks/useInventory';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 /**
  * Renders an inventory dashboard section showing a list of items and their aggregate weight.
  *
  * Displays a header with the title and computed total weight, a responsive grid of InventoryItem entries, and a full-width "Add New Item" button.
+ * Uses real-time data from Convex for the user's first character.
  *
  * @returns A JSX element containing the inventory grid UI.
  */
 export default function InventoryGrid() {
-  const items = [
-    { id: '1', name: 'Longsword +1', type: 'weapon', quantity: 1, weight: 3 },
-    { id: '2', name: 'Health Potion', type: 'potion', quantity: 5, weight: 0.5 },
-    { id: '3', name: 'Rope (50 ft)', type: 'tool', quantity: 1, weight: 10 },
-    { id: '4', name: 'Torch', type: 'tool', quantity: 10, weight: 1 },
-    { id: '5', name: 'Rations', type: 'misc', quantity: 7, weight: 2 },
-    { id: '6', name: 'Gold Pieces', type: 'misc', quantity: 237, weight: 0.02 },
-  ];
+  const { user } = useAuth();
+  const { characters, isLoading: loadingCharacters } = useCharactersByUser(user?._id);
 
-  const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
+  // Get the first character for this user
+  const character = characters?.[0];
+  const { items, isLoading: loadingItems } = useInventory(character?._id);
+
+  const totalWeight = items?.reduce((sum, item) => sum + item.weight * item.quantity, 0) || 0;
+
+  if (loadingCharacters || loadingItems) {
+    return (
+      <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 flex justify-center items-center min-h-[300px]">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
@@ -32,9 +43,15 @@ export default function InventoryGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {items.map((item) => (
-          <InventoryItem key={item.id} item={item} />
-        ))}
+        {items && items.length > 0 ? (
+          items.map((item) => (
+            <InventoryItem key={item._id} item={item} />
+          ))
+        ) : (
+          <div className="col-span-2 text-center py-8 text-gray-400">
+            No items in inventory
+          </div>
+        )}
       </div>
 
       <button className="mt-6 w-full py-3 border-2 border-dashed border-gray-700 rounded-lg text-gray-400 hover:border-purple-500 hover:text-purple-400 transition-colors">
