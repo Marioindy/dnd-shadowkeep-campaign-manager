@@ -1,9 +1,29 @@
 import type { Metadata } from 'next';
 import '../styles/globals.css';
+import { OfflineProvider } from '../contexts/OfflineContext';
+import { OfflineIndicator } from '../components/shared/OfflineIndicator';
 
 export const metadata: Metadata = {
   title: 'D&D Campaign Manager - Shadowkeep',
   description: 'Real-time collaborative tabletop RPG management platform',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Shadowkeep',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icon-192.png',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 /**
@@ -19,7 +39,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <OfflineProvider>
+          {children}
+          <OfflineIndicator />
+        </OfflineProvider>
+      </body>
     </html>
   );
 }
