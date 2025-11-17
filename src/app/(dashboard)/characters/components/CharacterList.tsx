@@ -63,11 +63,35 @@ export default function CharacterList() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {characters.map((character) => (
-          <CharacterCard key={character.id} character={character} />
-        ))}
-      </div>
+      {characters.length === 0 ? (
+        <div
+          className="flex flex-col items-center justify-center py-16 px-6 text-center"
+          role="region"
+          aria-label="Empty character list"
+        >
+          <div className="max-w-md space-y-4">
+            <h2 className="text-2xl font-bold text-gray-200">
+              No characters yet
+            </h2>
+            <p className="text-gray-400">
+              Start your adventure by creating your first character. Build your
+              hero with custom stats, abilities, and backstory.
+            </p>
+            <Link
+              href="/characters/new"
+              className="inline-block mt-4 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
+            >
+              Create Your First Character
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {characters.map((character) => (
+            <CharacterCard key={character.id} character={character} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,9 @@
 'use client';
 
+import { InventoryItem } from '@/types';
+
 interface InventoryItemProps {
-  item: {
-    _id: string;
-    name: string;
-    type: string;
-    quantity: number;
-    weight: number;
-  };
+  item: InventoryItem;
 }
 
 /**

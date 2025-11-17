@@ -17,6 +17,12 @@
  * const createCharacter = useMutation(api.characters.create);
  */
 
-export const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL;
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+if (!convexUrl) {
+  throw new Error("NEXT_PUBLIC_CONVEX_URL must be set");
+}
+
+export const CONVEX_URL: string = convexUrl;
 
 // Add Convex provider setup here once initialized

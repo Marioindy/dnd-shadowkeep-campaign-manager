@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+
 /**
- * Renders a static, styled list of documents with type badges, metadata, and action buttons.
+ * Renders a searchable list of documents with type badges, metadata, and action buttons.
  *
- * The list is produced from a predefined in-component array; the search input and action buttons
- * are present for UI purposes but do not have attached handlers in this component.
+ * The list is produced from a predefined in-component array; the search input filters
+ * documents by name in real-time as the user types.
  *
  * @returns The rendered documents list as a JSX element
  */
 export default function DocumentList() {
+  const [searchQuery, setSearchQuery] = useState('');
   const documents = [
     { id: '1', name: 'Campaign Outline', type: 'PDF', size: '2.4 MB', uploadedAt: '2025-11-01' },
     { id: '2', name: 'NPC Roster', type: 'PDF', size: '1.8 MB', uploadedAt: '2025-10-28' },
@@ -16,6 +19,10 @@ export default function DocumentList() {
     { id: '4', name: 'Lore Document', type: 'PDF', size: '5.2 MB', uploadedAt: '2025-10-10' },
     { id: '5', name: 'Monster Stats', type: 'PDF', size: '3.1 MB', uploadedAt: '2025-10-05' },
   ];
+
+  const filteredDocuments = documents.filter(doc =>
+    doc.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -37,12 +44,15 @@ export default function DocumentList() {
         <input
           type="text"
           placeholder="Search documents..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          aria-label="Search documents"
           className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none w-64"
         />
       </div>
 
       <div className="space-y-2">
-        {documents.map((doc) => (
+        {filteredDocuments.map((doc) => (
           <div
             key={doc.id}
             className="flex items-center justify-between bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors cursor-pointer"

@@ -1,27 +1,61 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
+import { MapMarker as MapMarkerType } from '@/types';
+import { MarkerAnimations } from '@/utils/mapAnimations';
+
 interface MapMarkerProps {
-  marker: {
-    id: string;
-    x: number;
-    y: number;
-    type: string;
-    label?: string;
-    color?: string;
-  };
+  marker: MapMarkerType;
+  onRemove?: () => void;
 }
 
 /**
- * Render a circular map marker at the given coordinates with an optional hover tooltip.
+ * Render a circular map marker at the given coordinates with animated entrance/exit effects.
  *
- * Displays a colored circular badge centered at (marker.x, marker.y). The badge shows the first character of `marker.label` or `'?'` when no label is provided; if `marker.label` is present, the full label appears in a non-interactive tooltip on hover.
+ * Features GSAP animations for:
+ * - Placement: Pop-in effect with rotation
+ * - Removal: Pop-out effect with rotation
+ * - Hover: Smooth scale transition
  *
- * @param marker - Marker data: `id` (string), `x` and `y` (coordinates used for CSS `left`/`top`), `type` (string), optional `label` (string) and optional `color` (CSS color string)
+ * @param marker - Marker data conforming to the shared MapMarker type with fields: `id` (string), `type` ('player'|'npc'|'enemy'|'poi'), `x` and `y` (coordinates), `visible` (boolean), optional `label`, `color`, and `iconUrl`
+ * @param onRemove - Optional callback fired when marker removal animation completes
  * @returns A JSX element that visually represents the positioned map marker and its tooltip
  */
-export default function MapMarker({ marker }: MapMarkerProps) {
+export default function MapMarker({ marker, onRemove }: MapMarkerProps) {
+  const markerRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
+
+  // Animate marker placement on mount
+  useEffect(() => {
+    if (markerRef.current && isInitialMount.current) {
+      MarkerAnimations.placeMarker(markerRef.current);
+      isInitialMount.current = false;
+    }
+  }, []);
+
+  // Handle marker visibility changes
+  useEffect(() => {
+    if (markerRef.current && !isInitialMount.current) {
+      if (marker.visible) {
+        MarkerAnimations.placeMarker(markerRef.current);
+      } else {
+        MarkerAnimations.removeMarker(markerRef.current, {
+          onComplete: onRemove,
+        });
+      }
+    }
+  }, [marker.visible, onRemove]);
+
+  // Animate position changes
+  useEffect(() => {
+    if (markerRef.current && !isInitialMount.current) {
+      MarkerAnimations.moveMarker(markerRef.current, marker.x, marker.y);
+    }
+  }, [marker.x, marker.y]);
+
   return (
     <div
+      ref={markerRef}
       className="absolute w-8 h-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
       style={{ left: marker.x, top: marker.y }}
     >
@@ -32,7 +66,7 @@ export default function MapMarker({ marker }: MapMarkerProps) {
         {marker.label?.charAt(0) || '?'}
       </div>
       {marker.label && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
           {marker.label}
         </div>
       )}
