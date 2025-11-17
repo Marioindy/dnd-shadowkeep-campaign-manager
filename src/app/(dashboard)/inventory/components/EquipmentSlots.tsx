@@ -1,21 +1,35 @@
 'use client';
 
+import { useDroppable } from '@dnd-kit/core';
+import { EquipmentSlot } from '@/lib/dragValidation';
+import { InventoryItem } from '@/types';
+import { useDragState } from './InventoryDragDrop';
+import InventoryItemComponent from './InventoryItem';
+
+interface EquipmentSlotsProps {
+  equipment?: Record<EquipmentSlot, InventoryItem | null>;
+  showValidationFeedback?: boolean;
+}
+
 /**
  * Render a styled equipment panel listing character equipment slots and their current items.
+ * Each slot is droppable and shows visual feedback during drag operations.
  *
- * Each slot shows its label and either the equipped item's name or an "Empty" placeholder,
- * with visual styling that differs for occupied versus vacant slots.
- *
- * @returns A JSX element containing the equipment panel with individual slot entries.
+ * @param equipment - The currently equipped items
+ * @param showValidationFeedback - Whether to show validation messages during drag
+ * @returns A JSX element containing the equipment panel with droppable slot entries.
  */
-export default function EquipmentSlots() {
-  const slots = [
-    { id: 'head', label: 'Head', equipped: null },
-    { id: 'chest', label: 'Chest', equipped: 'Chain Mail' },
-    { id: 'mainHand', label: 'Main Hand', equipped: 'Longsword +1' },
-    { id: 'offHand', label: 'Off Hand', equipped: 'Shield' },
-    { id: 'legs', label: 'Legs', equipped: null },
-    { id: 'feet', label: 'Feet', equipped: 'Boots of Speed' },
+export default function EquipmentSlots({
+  equipment,
+  showValidationFeedback = true,
+}: EquipmentSlotsProps) {
+  const slots: Array<{ id: EquipmentSlot; label: string }> = [
+    { id: 'head', label: 'Head' },
+    { id: 'chest', label: 'Chest' },
+    { id: 'mainHand', label: 'Main Hand' },
+    { id: 'offHand', label: 'Off Hand' },
+    { id: 'legs', label: 'Legs' },
+    { id: 'feet', label: 'Feet' },
   ];
 
   return (
@@ -24,27 +38,72 @@ export default function EquipmentSlots() {
 
       <div className="space-y-3">
         {slots.map((slot) => (
-          <div
+          <EquipmentSlot
             key={slot.id}
-            onClick={() => console.log('Slot clicked:', slot.id)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && console.log('Slot activated:', slot.id)}
-            className={`rounded-lg p-4 border-2 transition-all ${
-              slot.equipped
-                ? 'bg-gray-800 border-purple-500'
-                : 'bg-gray-800/50 border-dashed border-gray-700'
-            } cursor-pointer hover:border-purple-400`}
-          >
-            <p className="text-xs text-gray-400 mb-1">{slot.label}</p>
-            {slot.equipped ? (
-              <p className="text-white font-medium">{slot.equipped}</p>
-            ) : (
-              <p className="text-gray-600 text-sm italic">Empty</p>
-            )}
-          </div>
+            slot={slot.id}
+            label={slot.label}
+            equippedItem={equipment?.[slot.id] || null}
+            showValidationFeedback={showValidationFeedback}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+interface EquipmentSlotProps {
+  slot: EquipmentSlot;
+  label: string;
+  equippedItem: InventoryItem | null;
+  showValidationFeedback: boolean;
+}
+
+/**
+ * Individual equipment slot component with drop zone
+ */
+function EquipmentSlot({
+  slot,
+  label,
+  equippedItem,
+  showValidationFeedback,
+}: EquipmentSlotProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `equipment-${slot}`,
+    data: {
+      slot,
+      item: equippedItem,
+    },
+  });
+
+  const { dragOverSlot, validationMessage } = useDragState();
+  const isValidDrop = dragOverSlot === slot && !validationMessage;
+  const isInvalidDrop = dragOverSlot === slot && validationMessage;
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`rounded-lg p-4 border-2 transition-all ${
+        equippedItem
+          ? 'bg-gray-800 border-purple-500'
+          : 'bg-gray-800/50 border-dashed border-gray-700'
+      } ${isValidDrop ? 'border-green-500 bg-green-500/10' : ''} ${
+        isInvalidDrop ? 'border-red-500 bg-red-500/10' : ''
+      } ${isOver ? 'scale-105' : 'scale-100'}`}
+    >
+      <p className="text-xs text-gray-400 mb-1">{label}</p>
+      {equippedItem ? (
+        <InventoryItemComponent
+          item={equippedItem}
+          source="equipment"
+          slot={slot}
+          isDraggable={true}
+        />
+      ) : (
+        <div className="text-gray-600 text-sm italic py-2">Empty</div>
+      )}
+      {showValidationFeedback && isInvalidDrop && validationMessage && (
+        <p className="text-xs text-red-400 mt-2">{validationMessage}</p>
+      )}
     </div>
   );
 }
