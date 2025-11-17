@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation } from 'convex/react';
-import { api } from '../../../../../convex/_generated/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { validateUsername, validatePassword } from '@/lib/auth';
 
@@ -16,7 +14,6 @@ import { validateUsername, validatePassword } from '@/lib/auth';
 export default function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
-  const loginMutation = useMutation(api.auth.login);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -45,16 +42,9 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      // Call Convex authentication mutation
-      const response = await loginMutation({
-        username: formData.username,
-        password: formData.password,
-      });
-
-      // Store session and user data
-      login(response.user, response.sessionToken);
-
-      // Redirect to dashboard
+      // Call login from AuthProvider
+      await login(formData.username, formData.password);
+      // Redirect to dashboard on successful login
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');

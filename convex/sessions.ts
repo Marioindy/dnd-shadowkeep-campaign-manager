@@ -1,5 +1,5 @@
-import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+import { mutation, query } from './_generated/server';
 
 /**
  * Get a single session by ID with its encounters composed
@@ -10,22 +10,27 @@ export const getSession = query({
     const session = await ctx.db.get(args.sessionId);
     if (!session) return null;
 
-    // Fetch all encounters for this session
-    const encounters = await ctx.db
-      .query('encounters')
-      .withIndex('by_session', (q) => q.eq('sessionId', args.sessionId))
-      .collect();
+    // Fetch all encounters for this session if encounters table exists
+    try {
+      const encounters = await ctx.db
+        .query('encounters')
+        .withIndex('by_session', (q) => q.eq('sessionId', args.sessionId))
+        .collect();
 
-    // Compose session with encounters, mapping DB format to view format
-    return {
-      ...session,
-      encounters: encounters.map((enc) => ({
-        id: enc._id,
-        name: enc.name,
-        enemies: enc.enemies,
-        initiative: enc.initiative,
-      })),
-    };
+      // Compose session with encounters
+      return {
+        ...session,
+        encounters: encounters.map((enc) => ({
+          id: enc._id,
+          name: enc.name,
+          enemies: enc.enemies,
+          initiative: enc.initiative,
+        })),
+      };
+    } catch (e) {
+      // If encounters table doesn't exist yet, just return session
+      return session;
+    }
   },
 });
 
@@ -41,27 +46,76 @@ export const getSessionsByCampaign = query({
       .withIndex('by_campaign', (q) => q.eq('campaignId', args.campaignId))
       .collect();
 
-    // Fetch all encounters for these sessions
-    const composedSessions = await Promise.all(
-      sessions.map(async (session) => {
-        const encounters = await ctx.db
-          .query('encounters')
-          .withIndex('by_session', (q) => q.eq('sessionId', session._id))
-          .collect();
+    // Try to fetch encounters for each session
+    try {
+      const composedSessions = await Promise.all(
+        sessions.map(async (session) => {
+          const encounters = await ctx.db
+            .query('encounters')
+            .withIndex('by_session', (q) => q.eq('sessionId', session._id))
+            .collect();
 
-        return {
-          ...session,
-          encounters: encounters.map((enc) => ({
-            id: enc._id,
-            name: enc.name,
-            enemies: enc.enemies,
-            initiative: enc.initiative,
-          })),
-        };
-      })
-    );
+          return {
+            ...session,
+            encounters: encounters.map((enc) => ({
+              id: enc._id,
+              name: enc.name,
+              enemies: enc.enemies,
+              initiative: enc.initiative,
+            })),
+          };
+        })
+      );
 
-    return composedSessions;
+      return composedSessions;
+    } catch (e) {
+      // If encounters table doesn't exist, return sessions without encounters
+      return sessions;
+    }
+  },
+});
+
+/**
+ * List all sessions for a campaign (simple list without encounters)
+ */
+export const listByCampaign = query({
+  args: {
+    campaignId: v.id('campaigns'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('sessions')
+      .withIndex('by_campaign', (q) => q.eq('campaignId', args.campaignId))
+      .order('desc')
+      .collect();
+  },
+});
+
+/**
+ * Get active session for a campaign
+ */
+export const getActive = query({
+  args: {
+    campaignId: v.id('campaigns'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('sessions')
+      .withIndex('by_campaign', (q) => q.eq('campaignId', args.campaignId))
+      .filter((q) => q.eq(q.field('active'), true))
+      .first();
+  },
+});
+
+/**
+ * Get a single session (simple, without encounters)
+ */
+export const get = query({
+  args: {
+    id: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
   },
 });
 
@@ -74,7 +128,7 @@ export const createSession = mutation({
     name: v.string(),
     date: v.number(),
     notes: v.string(),
-    active: v.boolean(),
+    active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const sessionId = await ctx.db.insert('sessions', {
@@ -82,9 +136,85 @@ export const createSession = mutation({
       name: args.name,
       date: args.date,
       notes: args.notes,
-      active: args.active,
+      active: args.active ?? false,
     });
     return sessionId;
+  },
+});
+
+/**
+ * Alias for compatibility
+ */
+export const create = createSession;
+
+/**
+ * Start a session (set as active)
+ */
+export const start = mutation({
+  args: {
+    id: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.id);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    // Deactivate all other sessions for this campaign
+    const allSessions = await ctx.db
+      .query('sessions')
+      .withIndex('by_campaign', (q) => q.eq('campaignId', session.campaignId))
+      .collect();
+
+    for (const s of allSessions) {
+      if (s.active) {
+        await ctx.db.patch(s._id, { active: false });
+      }
+    }
+
+    // Activate this session
+    await ctx.db.patch(args.id, { active: true });
+
+    // Update campaign's currentSession if it exists
+    try {
+      await ctx.db.patch(session.campaignId, {
+        currentSession: args.id,
+        updatedAt: Date.now(),
+      });
+    } catch (e) {
+      // Campaign might not have currentSession field
+    }
+
+    return args.id;
+  },
+});
+
+/**
+ * End a session (deactivate)
+ */
+export const end = mutation({
+  args: {
+    id: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { active: false });
+    return args.id;
+  },
+});
+
+/**
+ * Update session notes
+ */
+export const updateNotes = mutation({
+  args: {
+    id: v.id('sessions'),
+    notes: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      notes: args.notes,
+    });
+    return args.id;
   },
 });
 
@@ -102,6 +232,35 @@ export const updateSession = mutation({
   handler: async (ctx, args) => {
     const { sessionId, ...updates } = args;
     await ctx.db.patch(sessionId, updates);
+  },
+});
+
+/**
+ * Alias for compatibility
+ */
+export const update = mutation({
+  args: {
+    id: v.id('sessions'),
+    name: v.optional(v.string()),
+    date: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+    return id;
+  },
+});
+
+/**
+ * Delete a session
+ */
+export const remove = mutation({
+  args: {
+    id: v.id('sessions'),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 

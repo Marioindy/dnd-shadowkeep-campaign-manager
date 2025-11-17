@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 
@@ -17,8 +17,9 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (userData: User, sessionToken: string) => void;
-  logout: () => void;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (username: string, password: string, role: 'player' | 'dm') => Promise<void>;
   hasRole: (role: 'player' | 'dm' | 'admin') => boolean;
   canAccessDM: () => boolean;
   canAccessAdmin: () => boolean;
@@ -50,6 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api.auth.verifySession,
     storedUserId ? { userId: storedUserId as Id<'users'> } : 'skip'
   );
+
+  // Auth mutations
+  const loginMutation = useMutation(api.auth.login);
+  const logoutMutation = useMutation(api.auth.logout);
+  const registerMutation = useMutation(api.auth.register);
 
   // Initialize authentication state from localStorage
   useEffect(() => {
@@ -86,19 +92,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, [verifiedUser]);
 
-  const login = (userData: User, sessionToken: string) => {
-    setUser(userData);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
-      localStorage.setItem(USER_ID_KEY, userData._id);
+  const login = async (username: string, password: string) => {
+    try {
+      const result = await loginMutation({ username, password });
+      if (result.success && result.user) {
+        setUser(result.user);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(SESSION_TOKEN_KEY, result.sessionToken);
+          localStorage.setItem(USER_ID_KEY, result.user._id);
+        }
+      } else {
+        throw new Error(result.error || 'Login failed');
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(SESSION_TOKEN_KEY);
-      localStorage.removeItem(USER_ID_KEY);
+  const logout = async () => {
+    try {
+      const sessionToken = typeof window !== 'undefined'
+        ? localStorage.getItem(SESSION_TOKEN_KEY)
+        : null;
+
+      if (sessionToken) {
+        await logoutMutation({ sessionToken });
+      }
+
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_ID_KEY);
+      }
+    } catch (error) {
+      // Clear local state even if server request fails
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_ID_KEY);
+      }
+    }
+  };
+
+  const register = async (username: string, password: string, role: 'player' | 'dm') => {
+    try {
+      const result = await registerMutation({ username, password, role });
+      if (result.success && result.sessionToken) {
+        // Fetch user data
+        const userData = verifiedUser;
+        if (userData) {
+          setUser(userData);
+        }
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(SESSION_TOKEN_KEY, result.sessionToken);
+          localStorage.setItem(USER_ID_KEY, result.userId);
+        }
+      } else {
+        throw new Error(result.error || 'Registration failed');
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -128,6 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!user,
     login,
     logout,
+    register,
     hasRole,
     canAccessDM,
     canAccessAdmin,

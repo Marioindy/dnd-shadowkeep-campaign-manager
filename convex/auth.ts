@@ -1,6 +1,50 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { Id } from './_generated/dataModel';
 import { hashPassword, verifyPassword, generateSessionToken } from './lib/crypto';
+
+// In-memory session storage
+// TODO: In production, store sessions in a database table with expiration
+const sessions = new Map<string, { userId: Id<'users'>; createdAt: number }>();
+
+/**
+ * Register a new user
+ */
+export const register = mutation({
+  args: {
+    username: v.string(),
+    password: v.string(),
+    role: v.union(v.literal('player'), v.literal('dm')),
+  },
+  handler: async (ctx, args) => {
+    // Check if username already exists
+    const existing = await ctx.db
+      .query('users')
+      .withIndex('by_username', (q) => q.eq('username', args.username))
+      .first();
+
+    if (existing) {
+      return { success: false, error: 'Username already exists' };
+    }
+
+    // Hash password
+    const passwordHash = await hashPassword(args.password);
+
+    // Create user
+    const userId = await ctx.db.insert('users', {
+      username: args.username,
+      passwordHash,
+      role: args.role,
+      createdAt: Date.now(),
+    });
+
+    // Generate session token
+    const sessionToken = generateSessionToken();
+    sessions.set(sessionToken, { userId, createdAt: Date.now() });
+
+    return { success: true, sessionToken, userId };
+  },
+});
 
 /**
  * Login mutation - Authenticates a user and returns a session token
@@ -18,20 +62,22 @@ export const login = mutation({
       .first();
 
     if (!user) {
-      throw new Error('Invalid username or password');
+      return { success: false, error: 'Invalid username or password' };
     }
 
     // Verify password
     const isValid = await verifyPassword(args.password, user.passwordHash);
     if (!isValid) {
-      throw new Error('Invalid username or password');
+      return { success: false, error: 'Invalid username or password' };
     }
 
     // Generate session token
     const sessionToken = generateSessionToken();
+    sessions.set(sessionToken, { userId: user._id, createdAt: Date.now() });
 
     // Return user data (without password hash) and session token
     return {
+      success: true,
       sessionToken,
       user: {
         _id: user._id,
@@ -45,27 +91,6 @@ export const login = mutation({
 });
 
 /**
- * Get current user by session token
- */
-export const getCurrentUser = query({
-  args: {
-    sessionToken: v.string(),
-  },
-  handler: async (ctx, args) => {
-    // In a production app, you'd want to store sessions in a separate table
-    // For now, we'll validate the token format and let the client manage sessions
-    if (!args.sessionToken || args.sessionToken.length < 32) {
-      return null;
-    }
-
-    // Since we're using client-side session management,
-    // the user ID will be stored in the token or localStorage
-    // For now, return null - the client will handle session validation
-    return null;
-  },
-});
-
-/**
  * Logout mutation - Invalidates a session
  */
 export const logout = mutation({
@@ -73,9 +98,48 @@ export const logout = mutation({
     sessionToken: v.string(),
   },
   handler: async (ctx, args) => {
-    // In a production app, you'd want to invalidate the session in the database
-    // For now, client-side session clearing is sufficient
+    sessions.delete(args.sessionToken);
     return { success: true };
+  },
+});
+
+/**
+ * Get current user by session token
+ */
+export const getCurrentUser = query({
+  args: {
+    sessionToken: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get session
+    const session = sessions.get(args.sessionToken);
+    if (!session) {
+      return null;
+    }
+
+    // Check if session is expired (24 hours)
+    const sessionAge = Date.now() - session.createdAt;
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    if (sessionAge > maxAge) {
+      sessions.delete(args.sessionToken);
+      return null;
+    }
+
+    // Get user
+    const user = await ctx.db.get(session.userId);
+    if (!user) {
+      sessions.delete(args.sessionToken);
+      return null;
+    }
+
+    // Return user without password hash
+    return {
+      _id: user._id,
+      username: user.username,
+      role: user.role,
+      campaignId: user.campaignId,
+      createdAt: user.createdAt,
+    };
   },
 });
 
