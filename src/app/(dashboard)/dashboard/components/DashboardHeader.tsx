@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import NotificationBell from '@/components/shared/NotificationBell';
 
 /**
  * Header bar for the dashboard that displays branding, navigation, and user controls.
@@ -40,13 +41,17 @@ export default function DashboardHeader() {
               <Link href="/session-tools" className="text-gray-300 hover:text-purple-400 transition-colors">
                 Session Tools
               </Link>
+              <Link href="/community" className="text-gray-300 hover:text-purple-400 transition-colors">
+                Community
+              </Link>
             </nav>
           </div>
 
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-400">
-              Welcome, <span className="text-purple-400 font-semibold">{user.username}</span>
-            </span>
+            <NotificationBell />
+            <Link href="/profile" className="text-sm text-gray-400 hover:text-purple-400 transition-colors">
+              <span className="text-purple-400 font-semibold">{user.username}</span>
+            </Link>
             {user.role === 'dm' && (
               <Link
                 href="/dm/overview"

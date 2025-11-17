@@ -1,206 +1,189 @@
+import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
-
-const encounterValidator = v.object({
-  id: v.string(),
-  name: v.string(),
-  enemies: v.array(
-    v.object({
-      id: v.string(),
-      name: v.string(),
-      hp: v.number(),
-      maxHp: v.number(),
-      ac: v.number(),
-      initiativeBonus: v.number(),
-    })
-  ),
-  initiative: v.array(
-    v.object({
-      id: v.string(),
-      name: v.string(),
-      initiative: v.number(),
-      type: v.union(v.literal('player'), v.literal('enemy'), v.literal('npc')),
-    })
-  ),
-});
 
 /**
- * Get all sessions for a campaign
+ * Get a single session by ID with its encounters composed
  */
-export const byCampaign = query({
-  args: { campaignId: v.id('campaigns') },
+export const getSession = query({
+  args: { sessionId: v.id('sessions') },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query('sessions')
-      .withIndex('by_campaign', (q) => q.eq('campaignId', args.campaignId))
+    const session = await ctx.db.get(args.sessionId);
+    if (!session) return null;
+
+    // Fetch all encounters for this session
+    const encounters = await ctx.db
+      .query('encounters')
+      .withIndex('by_session', (q) => q.eq('sessionId', args.sessionId))
       .collect();
+
+    // Compose session with encounters, mapping DB format to view format
+    return {
+      ...session,
+      encounters: encounters.map((enc) => ({
+        id: enc._id,
+        name: enc.name,
+        enemies: enc.enemies,
+        initiative: enc.initiative,
+      })),
+    };
   },
 });
 
 /**
- * Get active session for a campaign
+ * Get all sessions for a campaign with their encounters composed
  */
-export const getActive = query({
+export const getSessionsByCampaign = query({
   args: { campaignId: v.id('campaigns') },
   handler: async (ctx, args) => {
+    // Fetch all sessions for this campaign
     const sessions = await ctx.db
       .query('sessions')
       .withIndex('by_campaign', (q) => q.eq('campaignId', args.campaignId))
       .collect();
-    return sessions.find((s) => s.active === true) || null;
-  },
-});
 
-/**
- * Get a single session by ID
- */
-export const get = query({
-  args: { id: v.id('sessions') },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    // Fetch all encounters for these sessions
+    const composedSessions = await Promise.all(
+      sessions.map(async (session) => {
+        const encounters = await ctx.db
+          .query('encounters')
+          .withIndex('by_session', (q) => q.eq('sessionId', session._id))
+          .collect();
+
+        return {
+          ...session,
+          encounters: encounters.map((enc) => ({
+            id: enc._id,
+            name: enc.name,
+            enemies: enc.enemies,
+            initiative: enc.initiative,
+          })),
+        };
+      })
+    );
+
+    return composedSessions;
   },
 });
 
 /**
  * Create a new session
  */
-export const create = mutation({
+export const createSession = mutation({
   args: {
     campaignId: v.id('campaigns'),
     name: v.string(),
+    date: v.number(),
     notes: v.string(),
+    active: v.boolean(),
   },
   handler: async (ctx, args) => {
     const sessionId = await ctx.db.insert('sessions', {
       campaignId: args.campaignId,
       name: args.name,
-      date: Date.now(),
+      date: args.date,
       notes: args.notes,
-      active: false,
-      encounters: [],
+      active: args.active,
     });
     return sessionId;
   },
 });
 
 /**
- * Update a session
+ * Update a session (excluding encounters)
  */
-export const update = mutation({
+export const updateSession = mutation({
   args: {
-    id: v.id('sessions'),
+    sessionId: v.id('sessions'),
     name: v.optional(v.string()),
+    date: v.optional(v.number()),
     notes: v.optional(v.string()),
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
-    return id;
+    const { sessionId, ...updates } = args;
+    await ctx.db.patch(sessionId, updates);
   },
 });
 
 /**
- * Set session as active (deactivates other sessions in campaign)
+ * Create a new encounter for a session
  */
-export const setActive = mutation({
-  args: {
-    id: v.id('sessions'),
-  },
-  handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.id);
-    if (!session) throw new Error('Session not found');
-
-    // Deactivate all other sessions in the campaign
-    const allSessions = await ctx.db
-      .query('sessions')
-      .withIndex('by_campaign', (q) => q.eq('campaignId', session.campaignId))
-      .collect();
-
-    for (const s of allSessions) {
-      if (s._id !== args.id && s.active) {
-        await ctx.db.patch(s._id, { active: false });
-      }
-    }
-
-    // Activate this session
-    await ctx.db.patch(args.id, { active: true });
-    return args.id;
-  },
-});
-
-/**
- * Add an encounter to a session
- */
-export const addEncounter = mutation({
+export const createEncounter = mutation({
   args: {
     sessionId: v.id('sessions'),
-    encounter: encounterValidator,
+    name: v.string(),
+    enemies: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        hp: v.number(),
+        maxHp: v.number(),
+        ac: v.number(),
+        initiativeBonus: v.number(),
+      })
+    ),
+    initiative: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        initiative: v.number(),
+        type: v.union(v.literal('player'), v.literal('enemy'), v.literal('npc')),
+      })
+    ),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
-    if (!session) throw new Error('Session not found');
-
-    const encounters = session.encounters || [];
-    await ctx.db.patch(args.sessionId, {
-      encounters: [...encounters, args.encounter],
+    const encounterId = await ctx.db.insert('encounters', {
+      sessionId: args.sessionId,
+      name: args.name,
+      enemies: args.enemies,
+      initiative: args.initiative,
     });
-    return args.sessionId;
+    return encounterId;
   },
 });
 
 /**
- * Update an encounter in a session
+ * Update an encounter
  */
 export const updateEncounter = mutation({
   args: {
-    sessionId: v.id('sessions'),
-    encounterId: v.string(),
-    encounter: encounterValidator,
+    encounterId: v.id('encounters'),
+    name: v.optional(v.string()),
+    enemies: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          name: v.string(),
+          hp: v.number(),
+          maxHp: v.number(),
+          ac: v.number(),
+          initiativeBonus: v.number(),
+        })
+      )
+    ),
+    initiative: v.optional(
+      v.array(
+        v.object({
+          id: v.string(),
+          name: v.string(),
+          initiative: v.number(),
+          type: v.union(v.literal('player'), v.literal('enemy'), v.literal('npc')),
+        })
+      )
+    ),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
-    if (!session) throw new Error('Session not found');
-
-    const encounters = session.encounters || [];
-    const updatedEncounters = encounters.map((e) =>
-      e.id === args.encounterId ? args.encounter : e
-    );
-
-    await ctx.db.patch(args.sessionId, {
-      encounters: updatedEncounters,
-    });
-    return args.sessionId;
+    const { encounterId, ...updates } = args;
+    await ctx.db.patch(encounterId, updates);
   },
 });
 
 /**
- * Remove an encounter from a session
+ * Delete an encounter
  */
-export const removeEncounter = mutation({
-  args: {
-    sessionId: v.id('sessions'),
-    encounterId: v.string(),
-  },
+export const deleteEncounter = mutation({
+  args: { encounterId: v.id('encounters') },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
-    if (!session) throw new Error('Session not found');
-
-    const encounters = session.encounters || [];
-    await ctx.db.patch(args.sessionId, {
-      encounters: encounters.filter((e) => e.id !== args.encounterId),
-    });
-    return args.sessionId;
-  },
-});
-
-/**
- * Delete a session
- */
-export const remove = mutation({
-  args: { id: v.id('sessions') },
-  handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
-    return args.id;
+    await ctx.db.delete(args.encounterId);
   },
 });

@@ -20,6 +20,7 @@ A real-time, collaborative tabletop RPG management platform for Dungeons & Drago
 
 ## Tech Stack
 
+### Web Application
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
 - **UI**: React 18+ with functional components and hooks
@@ -28,9 +29,19 @@ A real-time, collaborative tabletop RPG management platform for Dungeons & Drago
 - **Animation**: GSAP (planned for map interactions)
 - **Hosting**: Cloudflare Pages or AWS Amplify
 
+### Mobile Application
+- **Framework**: React Native with Expo
+- **Language**: TypeScript
+- **UI**: React Native components with custom design system
+- **Navigation**: React Navigation (native stack + bottom tabs)
+- **Backend**: Convex (shared with web app)
+- **Offline**: AsyncStorage for local persistence
+- **Notifications**: Expo push notifications
+- **Platforms**: iOS and Android
+
 ## Project Structure
 
-```
+```text
 dnd-shadowkeep-campaign-manager/
 ├── src/
 │   ├── app/                          # Next.js App Router pages
@@ -223,6 +234,29 @@ npm run build
 npm start
 ```
 
+## Mobile App Setup
+
+The mobile app is located in the `mobile/` directory. See [`mobile/README.md`](mobile/README.md) for detailed setup instructions.
+
+**Quick Start:**
+
+```bash
+cd mobile
+npm install
+npm start
+```
+
+Then scan the QR code with Expo Go app on your device, or run:
+- `npm run ios` - iOS simulator (macOS only)
+- `npm run android` - Android emulator
+
+**Key Features:**
+- Cross-platform (iOS & Android)
+- Touch-optimized UI
+- Offline storage
+- Push notifications
+- Shared types and utilities with web app
+
 ## Development Workflow
 
 ### Adding New Features
@@ -248,13 +282,13 @@ Currently implements a **closed-door system**:
 
 ## Roadmap
 
-### Phase 1 (Current)
+### Phase 1 (Completed)
 - ✅ Project structure setup
 - ✅ Core page layouts
 - ✅ Component architecture
-- ⬜ Convex integration
-- ⬜ Authentication system
-- ⬜ Real-time data sync
+- ✅ Convex schema design
+- ⬜ Authentication system (in progress)
+- ⬜ Real-time data sync (in progress)
 
 ### Phase 2
 - ⬜ GSAP animations for maps
@@ -262,9 +296,17 @@ Currently implements a **closed-door system**:
 - ⬜ Advanced dice rolling with physics
 - ⬜ Audio/ambient sound integration
 
-### Phase 3
-- ⬜ Mobile app version
-- ⬜ Offline mode
+### Phase 3 (Current)
+- ✅ **Mobile app foundation**
+  - ✅ React Native with Expo setup
+  - ✅ Touch-optimized UI components
+  - ✅ Mobile navigation (bottom tabs)
+  - ✅ Responsive layouts for multiple screen sizes
+  - ✅ Offline storage foundation
+  - ✅ Push notification infrastructure
+  - ✅ Example screens (Dashboard, Character, Inventory, Maps, Tools)
+- ⬜ Convex integration for mobile
+- ⬜ Mobile-specific features (biometrics, camera upload)
 - ⬜ Campaign templates
 - ⬜ Community features
 

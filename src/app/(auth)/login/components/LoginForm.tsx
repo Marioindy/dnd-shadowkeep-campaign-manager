@@ -4,18 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
+import { useAuth } from '@/providers/AuthProvider';
+import { validateUsername, validatePassword } from '@/lib/auth';
 
 /**
- * Renders a login form for collecting username and password, manages loading and error states, and navigates to the dashboard on successful submission.
- *
- * Uses Convex authentication for real-time user verification.
- * Stores user data in localStorage for session management.
+ * Renders a login form with Convex authentication integration.
+ * Manages loading and error states, validates input, and navigates to the dashboard on successful login.
  *
  * @returns The rendered login form as a JSX element.
  */
 export default function LoginForm() {
   const router = useRouter();
-  const login = useMutation(api.auth.login);
+  const { login } = useAuth();
+  const loginMutation = useMutation(api.auth.login);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -27,22 +28,36 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate input
+    const usernameValidation = validateUsername(formData.username);
+    if (!usernameValidation.isValid) {
+      setError(usernameValidation.errors[0]);
+      return;
+    }
+
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // Authenticate with Convex backend
-      const user = await login({
+      // Call Convex authentication mutation
+      const response = await loginMutation({
         username: formData.username,
         password: formData.password,
       });
 
-      // Store user data in localStorage for session management
-      localStorage.setItem('user', JSON.stringify(user));
+      // Store session and user data
+      login(response.user, response.sessionToken);
 
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err) {
-      setError('Invalid credentials. Please try again.');
+      setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
       console.error('Login error:', err);
     } finally {
       setLoading(false);

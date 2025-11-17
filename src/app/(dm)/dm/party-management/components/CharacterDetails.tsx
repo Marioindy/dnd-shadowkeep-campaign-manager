@@ -9,6 +9,9 @@
  * @returns A JSX element rendering the full character details view (header, stats grid, summaries, and inventory).
  */
 export default function CharacterDetails() {
+  // Mock character data - matches normalized Convex schema
+  // In real implementation, inventory would be fetched separately using:
+  // const inventory = useQuery(api.inventory.getByCharacter, { characterId: character._id });
   const character = {
     name: 'Thaldrin Ironforge',
     race: 'Dwarf',
@@ -26,12 +29,14 @@ export default function CharacterDetails() {
       ac: 18,
       speed: 25,
     },
-    inventory: [
-      { name: 'Longsword +1', quantity: 1 },
-      { name: 'Health Potion', quantity: 5 },
-      { name: 'Gold Pieces', quantity: 237 },
-    ],
   };
+
+  // Mock inventory data - would come from separate inventory table
+  const inventory = [
+    { name: 'Longsword +1', quantity: 1 },
+    { name: 'Health Potion', quantity: 5 },
+    { name: 'Gold Pieces', quantity: 237 },
+  ];
 
   return (
     <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
@@ -86,7 +91,7 @@ export default function CharacterDetails() {
       <div>
         <h3 className="text-lg font-semibold text-white mb-3">Inventory</h3>
         <div className="space-y-2">
-          {character.inventory.map((item, index) => (
+          {inventory.map((item, index) => (
             <div
               key={index}
               className="flex items-center justify-between bg-gray-800 rounded-lg p-3"
