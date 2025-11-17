@@ -2,13 +2,24 @@
 
 This document provides a comprehensive guide to the Convex backend integration for the D&D Shadowkeep Campaign Manager.
 
+> **Note:** This branch merges core Convex integration (campaigns, characters, inventory, maps) with enhanced features from main including:
+> - Community features (user follows, shared campaigns, profiles)
+> - Robust authentication with AuthProvider and session tokens
+> - Separate encounters table (better architecture)
+> - Mobile app support
+> - Admin panel and role-based access
+>
+> See `AUTHENTICATION.md` and `COMMUNITY_FEATURES.md` for details on these features.
+
 ## Overview
 
 The application uses [Convex](https://convex.dev) as its backend-as-a-service solution, providing:
 - **Real-time data synchronization** across all connected clients
 - **Type-safe database** with automatic TypeScript generation
 - **Serverless functions** for queries and mutations
-- **Built-in authentication** support
+- **Session-based authentication** with AuthProvider
+- **Community features** with social interactions
+- **Mobile app support** via React Native
 
 ## Setup Instructions
 
@@ -308,18 +319,29 @@ Convex automatically synchronizes data across all connected clients:
 
 ## Authentication Flow
 
-The current implementation uses a simple password-based authentication:
+The application uses a robust session-based authentication system:
 
 1. User submits credentials via LoginForm
-2. `auth.login` mutation validates credentials
-3. User object stored in localStorage for session management
-4. Components read userId from localStorage to query user-specific data
+2. LoginForm calls `auth.login` mutation with username/password
+3. Server validates credentials using crypto utilities (`convex/lib/crypto.ts`)
+4. Server returns user object and session token
+5. AuthProvider (`src/providers/AuthProvider.tsx`) stores session data
+6. Components use `useAuth()` hook to access current user and auth state
+7. Protected routes use AuthGuard and RoleGuard components
 
-**Security Note:** This is a basic implementation. For production, consider:
-- Session tokens with expiration
-- HTTP-only cookies
-- OAuth integration
-- Password encryption improvements (bcrypt vs simple SHA-256)
+**Key Features:**
+- **Password Hashing**: Uses crypto library for secure password storage
+- **Session Tokens**: JWT-style tokens with expiration
+- **Role-Based Access**: Admin, DM, and Player roles with authorization checks
+- **Input Validation**: Username and password validation before submission
+- **Auth Guards**: ProtectedRoute and RoleGuard components for route protection
+
+**Authentication Functions** (`convex/auth.ts`):
+- `login(username, password)` - Returns user and session token
+- `register(...)` - Creates new user account
+- `validateSession(token)` - Verifies session token validity
+
+For detailed authentication documentation, see `AUTHENTICATION.md`.
 
 ## Development Workflow
 
@@ -378,27 +400,38 @@ Use the Convex Dashboard at https://dashboard.convex.dev to:
 
 ### Recommended Enhancements
 
-1. **Add More Components:**
-   - Integrate MapViewer with real-time markers
+1. **Add More Component Integration:**
+   - Complete InventoryGrid integration
    - Connect CampaignInfo to Convex queries
-   - Add InventoryGrid integration
+   - Add DM Panel real-time features
 
-2. **Improve Authentication:**
-   - Implement session tokens
-   - Add password reset functionality
-   - Add OAuth providers
+2. **Authentication Enhancements:** ✅ *Mostly Complete*
+   - ✅ Session tokens implemented
+   - ✅ Password validation and hashing
+   - ✅ Role-based access control
+   - ⏳ Add password reset functionality
+   - ⏳ Add OAuth providers (Discord, Google)
 
-3. **Add Validation:**
-   - Server-side validation in mutations
-   - Client-side form validation
-   - Type guards for complex objects
+3. **Validation:** ✅ *Partially Complete*
+   - ✅ Server-side authorization checks
+   - ✅ Client-side form validation
+   - ⏳ Add more comprehensive validation rules
+   - ⏳ Type guards for complex objects
 
-4. **Performance Optimization:**
+4. **Community Features:** ✅ *Implemented*
+   - ✅ User follows system
+   - ✅ Shared campaigns
+   - ✅ Public profiles
+   - ✅ Social sharing
+   - See `COMMUNITY_FEATURES.md`
+
+5. **Performance Optimization:**
    - Implement pagination for large lists
    - Add caching strategies
    - Optimize query indexes
+   - Add optimistic updates
 
-5. **Testing:**
+6. **Testing:**
    - Unit tests for mutations
    - Integration tests for real-time sync
    - E2E tests for critical flows
