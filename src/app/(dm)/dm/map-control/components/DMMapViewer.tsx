@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { audioManager } from '@/lib/audioManager';
 
 /**
  * Render a DM-facing map viewer UI with controls for grid, markers, and fog of war.
@@ -8,6 +9,7 @@ import { useState } from 'react';
  * The component manages local UI state for showing the grid, markers, and fog (all enabled by default)
  * and presents a placeholder main view when no map is loaded. Header controls toggle the corresponding state,
  * and the footer exposes DM action buttons and usage hints.
+ * Includes audio feedback for map interactions with spatial audio support.
  *
  * @returns The rendered JSX element for the DM map viewer.
  */
@@ -15,6 +17,37 @@ export default function DMMapViewer() {
   const [showGrid, setShowGrid] = useState(true);
   const [showMarkers, setShowMarkers] = useState(true);
   const [showFog, setShowFog] = useState(true);
+
+  /**
+   * Handle fog of war toggle with audio feedback
+   */
+  const handleFogToggle = (checked: boolean) => {
+    setShowFog(checked);
+    if (checked) {
+      audioManager.playSoundEffect('fog_reveal', { volume: 0.6 });
+    }
+  };
+
+  /**
+   * Handle adding a map marker (placeholder for actual implementation)
+   */
+  const handleAddMarker = () => {
+    // Simulate placing marker at random position for audio demo
+    // In real implementation, this would use actual map coordinates
+    const randomX = (Math.random() * 2) - 1; // -1 to 1 (left to right)
+    const randomY = Math.random() * 0.5; // 0 to 0.5 (close to far)
+
+    audioManager.playSoundEffect('map_marker_placed', {
+      spatial: { x: randomX, y: randomY }
+    });
+  };
+
+  /**
+   * Handle revealing an area with audio feedback
+   */
+  const handleRevealArea = () => {
+    audioManager.playSoundEffect('fog_reveal', { volume: 0.8 });
+  };
 
   return (
     <div className="bg-gray-900 rounded-lg border border-gray-800 overflow-hidden">
@@ -45,7 +78,7 @@ export default function DMMapViewer() {
               <input
                 type="checkbox"
                 checked={showFog}
-                onChange={(e) => setShowFog(e.target.checked)}
+                onChange={(e) => handleFogToggle(e.target.checked)}
                 className="rounded"
               />
               <span className="text-sm text-gray-300">Fog of War</span>
@@ -67,10 +100,16 @@ export default function DMMapViewer() {
             DM controls: Right-click to add markers • Shift+drag to draw fog
           </div>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition-colors">
+            <button
+              onClick={handleAddMarker}
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm transition-colors"
+            >
               Add Marker
             </button>
-            <button className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm transition-colors">
+            <button
+              onClick={handleRevealArea}
+              className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm transition-colors"
+            >
               Reveal Area
             </button>
           </div>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { rollDice } from '@/lib/utils';
+import { audioManager } from '@/lib/audioManager';
 
 /**
  * Renders a Dice Roller interface with buttons for common dice; clicking a die generates a roll, displays the numeric result, and prepends a recent-roll entry (keeps up to 4 items).
+ * Includes audio feedback for dice rolls with special sounds for critical success/failure.
  *
  * @returns The component's JSX element containing the dice buttons, current result panel (when present), and recent rolls list (when non-empty).
  */
@@ -18,6 +20,23 @@ export default function DiceRoller() {
     const rolled = rollDice(sides);
     setResult(rolled);
     setHistory([{ roll: `d${sides}`, result: rolled }, ...history.slice(0, 4)]);
+
+    // Play appropriate sound effect
+    if (sides === 20) {
+      if (rolled === 20) {
+        // Critical success!
+        audioManager.playSoundEffect('dice_crit_success', { volume: 1.2 });
+      } else if (rolled === 1) {
+        // Critical failure!
+        audioManager.playSoundEffect('dice_crit_fail', { volume: 1.2 });
+      } else {
+        // Normal roll
+        audioManager.playSoundEffect('dice_roll');
+      }
+    } else {
+      // Normal dice roll sound
+      audioManager.playSoundEffect('dice_roll');
+    }
   };
 
   return (

@@ -170,6 +170,46 @@ export interface InitiativeEntry {
   type: 'player' | 'enemy' | 'npc';
 }
 
+// ============== AUDIO TYPES ==============
+
+export type SoundEffect =
+  | 'dice_roll'
+  | 'dice_crit_success'
+  | 'dice_crit_fail'
+  | 'initiative_start'
+  | 'initiative_next_turn'
+  | 'combatant_added'
+  | 'ability_cast'
+  | 'map_marker_placed'
+  | 'map_marker_removed'
+  | 'fog_reveal'
+  | 'combat_start'
+  | 'combat_end';
+
+export type AmbientTrack =
+  | 'tavern'
+  | 'dungeon'
+  | 'forest'
+  | 'combat'
+  | 'boss_battle'
+  | 'town'
+  | 'cave'
+  | 'mystical'
+  | 'peaceful';
+
+export interface AudioSettings {
+  masterVolume: number; // 0-1
+  sfxVolume: number; // 0-1
+  ambientVolume: number; // 0-1
+  enabled: boolean;
+  combatMusicEnabled: boolean;
+}
+
+export interface SpatialAudioOptions {
+  x: number; // -1 (left) to 1 (right)
+  y: number; // 0 (close) to 1 (far)
+}
+
 // ============== COMMUNITY FEATURE TYPES ==============
 
 // Shared campaign templates
