@@ -34,6 +34,9 @@ export default function DMHeader() {
               <Link href="/dm/documents" className="text-gray-300 hover:text-red-400 transition-colors">
                 Documents
               </Link>
+              <Link href="/dm/templates" className="text-gray-300 hover:text-red-400 transition-colors">
+                Templates
+              </Link>
             </nav>
           </div>
 
