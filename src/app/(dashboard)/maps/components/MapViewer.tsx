@@ -3,19 +3,24 @@
 import { useRef, useEffect, useState } from 'react';
 import MapMarkerComponent from './MapMarker';
 import { MapMarker } from '@/types';
+import { ViewportAnimations } from '@/utils/mapAnimations';
+import gsap from 'gsap';
 
 /**
- * Renders an interactive map viewer with draggable panning, zoom controls, and markers.
+ * Renders an interactive map viewer with smooth GSAP-powered panning, zoom controls, and animated markers.
  *
- * The component displays a placeholder map area with a grid, a header with zoom and reset controls,
- * and a footer hint. Users can pan by click-dragging the map and zoom with the mouse wheel or
- * the ± buttons; zoom is constrained between 50% and 300%. Markers from local state are rendered
- * via MapMarkerComponent.
+ * Features:
+ * - Smooth pan and zoom animations using GSAP
+ * - Interactive marker placement with pop-in effects
+ * - Mouse wheel zoom with animation
+ * - Button-based zoom controls
+ * - Reset view animation
  *
  * @returns A JSX element containing the map viewer UI
  */
 export default function MapViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapElementRef = useRef<HTMLDivElement>(null);
   const [markers, setMarkers] = useState<MapMarker[]>([
     { id: '1', x: 100, y: 150, type: 'player', label: 'Thaldrin', color: '#8b5cf6', visible: true },
     { id: '2', x: 200, y: 180, type: 'player', label: 'Lyra', color: '#ec4899', visible: true },
@@ -29,7 +34,46 @@ export default function MapViewer() {
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setScale((prev) => Math.min(Math.max(0.5, prev * delta), 3));
+    const newScale = Math.min(Math.max(0.5, scale * delta), 3);
+
+    if (mapElementRef.current && newScale !== scale) {
+      ViewportAnimations.zoomTo(mapElementRef.current, newScale, {
+        duration: 0.3,
+        ease: 'power2.out',
+      });
+      setScale(newScale);
+    }
+  };
+
+  const handleZoomIn = () => {
+    const newScale = Math.min(3, scale + 0.1);
+    if (mapElementRef.current && newScale !== scale) {
+      ViewportAnimations.zoomTo(mapElementRef.current, newScale, {
+        duration: 0.4,
+      });
+      setScale(newScale);
+    }
+  };
+
+  const handleZoomOut = () => {
+    const newScale = Math.max(0.5, scale - 0.1);
+    if (mapElementRef.current && newScale !== scale) {
+      ViewportAnimations.zoomTo(mapElementRef.current, newScale, {
+        duration: 0.4,
+      });
+      setScale(newScale);
+    }
+  };
+
+  const handleReset = () => {
+    if (mapElementRef.current) {
+      ViewportAnimations.resetView(mapElementRef.current, {
+        onComplete: () => {
+          setScale(1);
+          setPosition({ x: 0, y: 0 });
+        },
+      });
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -41,10 +85,19 @@ export default function MapViewer() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging) {
-      setPosition({
+      const newPosition = {
         x: e.clientX - dragStart.x,
         y: e.clientY - dragStart.y,
-      });
+      };
+      setPosition(newPosition);
+
+      // Update GSAP position without animation during drag
+      if (mapElementRef.current) {
+        gsap.set(mapElementRef.current, {
+          x: newPosition.x,
+          y: newPosition.y,
+        });
+      }
     }
   };
 
@@ -58,7 +111,7 @@ export default function MapViewer() {
         <h2 className="font-semibold text-white">Shadowkeep Dungeon - Level 1</h2>
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => setScale((prev) => Math.max(0.5, prev - 0.1))}
+            onClick={handleZoomOut}
             className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition-colors"
           >
             -
@@ -67,16 +120,13 @@ export default function MapViewer() {
             {Math.round(scale * 100)}%
           </span>
           <button
-            onClick={() => setScale((prev) => Math.min(3, prev + 0.1))}
+            onClick={handleZoomIn}
             className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition-colors"
           >
             +
           </button>
           <button
-            onClick={() => {
-              setScale(1);
-              setPosition({ x: 0, y: 0 });
-            }}
+            onClick={handleReset}
             className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm transition-colors ml-2"
           >
             Reset
@@ -94,11 +144,10 @@ export default function MapViewer() {
         onMouseLeave={handleMouseUp}
       >
         <div
+          ref={mapElementRef}
           className="absolute inset-0"
           style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
             transformOrigin: '0 0',
-            transition: isDragging ? 'none' : 'transform 0.1s',
           }}
         >
           {/* Placeholder map - replace with actual map image */}
