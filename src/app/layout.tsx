@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '../styles/globals.css';
 import { ConvexClientProvider } from '@/providers/ConvexClientProvider';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { OfflineProvider } from '@/contexts/OfflineContext';
 import { OfflineIndicator } from '@/components/shared/OfflineIndicator';
 

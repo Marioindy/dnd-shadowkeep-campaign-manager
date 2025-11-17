@@ -1,25 +1,11 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { Id } from './_generated/dataModel';
+import { hashPassword, verifyPassword, generateSessionToken } from './lib/crypto';
 
-// Simple session storage (in production, use proper session management)
-const sessions = new Map<string, Id<'users'>>();
-
-/**
- * Simple password hashing (in production, use bcrypt or similar)
- */
-function hashPassword(password: string): string {
-  // TODO: Replace with proper hashing (bcrypt, argon2, etc.)
-  // This is a placeholder - DO NOT use in production
-  return Buffer.from(password).toString('base64');
-}
-
-/**
- * Generate a random session token
- */
-function generateSessionToken(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
-}
+// In-memory session storage
+// TODO: In production, store sessions in a database table with expiration
+const sessions = new Map<string, { userId: Id<'users'>; createdAt: number }>();
 
 /**
  * Register a new user
@@ -41,24 +27,27 @@ export const register = mutation({
       return { success: false, error: 'Username already exists' };
     }
 
+    // Hash password
+    const passwordHash = await hashPassword(args.password);
+
     // Create user
     const userId = await ctx.db.insert('users', {
       username: args.username,
-      passwordHash: hashPassword(args.password),
+      passwordHash,
       role: args.role,
       createdAt: Date.now(),
     });
 
-    // Create session
+    // Generate session token
     const sessionToken = generateSessionToken();
-    sessions.set(sessionToken, userId);
+    sessions.set(sessionToken, { userId, createdAt: Date.now() });
 
     return { success: true, sessionToken, userId };
   },
 });
 
 /**
- * Login user
+ * Login mutation - Authenticates a user and returns a session token
  */
 export const login = mutation({
   args: {
@@ -66,6 +55,7 @@ export const login = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
+    // Find user by username
     const user = await ctx.db
       .query('users')
       .withIndex('by_username', (q) => q.eq('username', args.username))
@@ -75,21 +65,33 @@ export const login = mutation({
       return { success: false, error: 'Invalid username or password' };
     }
 
-    const passwordHash = hashPassword(args.password);
-    if (user.passwordHash !== passwordHash) {
+    // Verify password
+    const isValid = await verifyPassword(args.password, user.passwordHash);
+    if (!isValid) {
       return { success: false, error: 'Invalid username or password' };
     }
 
-    // Create session
+    // Generate session token
     const sessionToken = generateSessionToken();
-    sessions.set(sessionToken, user._id);
+    sessions.set(sessionToken, { userId: user._id, createdAt: Date.now() });
 
-    return { success: true, sessionToken, userId: user._id };
+    // Return user data (without password hash) and session token
+    return {
+      success: true,
+      sessionToken,
+      user: {
+        _id: user._id,
+        username: user.username,
+        role: user.role,
+        campaignId: user.campaignId,
+        createdAt: user.createdAt,
+      },
+    };
   },
 });
 
 /**
- * Logout user
+ * Logout mutation - Invalidates a session
  */
 export const logout = mutation({
   args: {
@@ -102,19 +104,29 @@ export const logout = mutation({
 });
 
 /**
- * Get current user from session token
+ * Get current user by session token
  */
 export const getCurrentUser = query({
   args: {
     sessionToken: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = sessions.get(args.sessionToken);
-    if (!userId) {
+    // Get session
+    const session = sessions.get(args.sessionToken);
+    if (!session) {
       return null;
     }
 
-    const user = await ctx.db.get(userId);
+    // Check if session is expired (24 hours)
+    const sessionAge = Date.now() - session.createdAt;
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    if (sessionAge > maxAge) {
+      sessions.delete(args.sessionToken);
+      return null;
+    }
+
+    // Get user
+    const user = await ctx.db.get(session.userId);
     if (!user) {
       sessions.delete(args.sessionToken);
       return null;
@@ -126,6 +138,32 @@ export const getCurrentUser = query({
       username: user.username,
       role: user.role,
       campaignId: user.campaignId,
+      createdAt: user.createdAt,
+    };
+  },
+});
+
+/**
+ * Verify session and get user
+ * This is a query that client components can use to check authentication status
+ */
+export const verifySession = query({
+  args: {
+    userId: v.id('users'),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      _id: user._id,
+      username: user.username,
+      role: user.role,
+      campaignId: user.campaignId,
+      createdAt: user.createdAt,
     };
   },
 });

@@ -2,18 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/providers/AuthProvider';
+import { validateUsername, validatePassword } from '@/lib/auth';
 
 /**
- * Renders a login form for collecting username and password, manages loading and error states, and navigates to the dashboard on successful submission.
- *
- * The form disables the submit button while a submission is in progress and displays an error message when authentication fails.
+ * Renders a login form with Convex authentication integration.
+ * Manages loading and error states, validates input, and navigates to the dashboard on successful login.
  *
  * @returns The rendered login form as a JSX element.
  */
 export default function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -24,14 +25,29 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate input
+    const usernameValidation = validateUsername(formData.username);
+    if (!usernameValidation.isValid) {
+      setError(usernameValidation.errors[0]);
+      return;
+    }
+
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors[0]);
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Call login from AuthProvider
       await login(formData.username, formData.password);
       // Redirect to dashboard on successful login
       router.push('/dashboard');
     } catch (err) {
-      setError('Invalid credentials. Please try again.');
+      setError(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
       console.error('Login error:', err);
     } finally {
       setLoading(false);
