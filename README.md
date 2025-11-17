@@ -10,6 +10,7 @@ A real-time, collaborative tabletop RPG management platform for Dungeons & Drago
 - **Interactive Maps**: View campaign maps with markers and fog of war controlled by the DM
 - **Session Tools**: Built-in dice roller and initiative tracker
 - **Campaign Notes**: Access shared campaign lore, quest objectives, and session history
+- **Offline Mode**: Continue playing even without internet - all changes sync automatically when reconnected
 
 ### For Dungeon Masters
 - **Party Overview**: Monitor all player characters, inventories, and stats at a glance
@@ -26,6 +27,8 @@ A real-time, collaborative tabletop RPG management platform for Dungeons & Drago
 - **UI**: React 18+ with functional components and hooks
 - **Styling**: Tailwind CSS
 - **Backend**: Convex (serverless with real-time sync)
+- **Offline Storage**: IndexedDB with Service Workers
+- **PWA**: Progressive Web App with offline-first architecture
 - **Animation**: GSAP (planned for map interactions)
 - **Hosting**: Cloudflare Pages or AWS Amplify
 
@@ -273,6 +276,37 @@ All database schemas are defined in `convex/schema.ts`. To add new tables:
 ### Type Definitions
 Global TypeScript types are in `src/types/index.ts`. Update this file when adding new data structures.
 
+## Offline Mode
+
+The application supports **full offline functionality** with automatic sync-on-reconnect:
+
+- **Local Storage**: All campaign data cached in IndexedDB
+- **Mutation Queue**: Changes made offline are queued and synced when connection restores
+- **Conflict Resolution**: Automatic conflict detection and resolution
+- **Optimistic Updates**: Immediate UI feedback for offline changes
+- **Service Worker**: Caches static assets for offline access
+- **PWA Support**: Install as a standalone app on mobile/desktop
+
+**Quick Start:**
+```typescript
+import { useOffline } from '@/contexts/OfflineContext';
+
+function MyComponent() {
+  const { isOnline, pendingMutations, syncNow } = useOffline();
+
+  return (
+    <div>
+      Status: {isOnline ? 'Online' : 'Offline'}
+      {pendingMutations > 0 && (
+        <button onClick={syncNow}>Sync {pendingMutations} changes</button>
+      )}
+    </div>
+  );
+}
+```
+
+For detailed documentation, see [docs/OFFLINE_MODE.md](docs/OFFLINE_MODE.md).
+
 ## Authentication
 
 Currently implements a **closed-door system**:
@@ -305,6 +339,13 @@ Currently implements a **closed-door system**:
   - ✅ Offline storage foundation
   - ✅ Push notification infrastructure
   - ✅ Example screens (Dashboard, Character, Inventory, Maps, Tools)
+- ✅ **Offline mode with sync-on-reconnect**
+  - ✅ IndexedDB storage for local data caching
+  - ✅ Mutation queue system for offline changes
+  - ✅ Automatic conflict resolution
+  - ✅ Service Worker for asset caching
+  - ✅ PWA support with offline page
+  - ✅ Real-time connection monitoring
 - ⬜ Convex integration for mobile
 - ⬜ Mobile-specific features (biometrics, camera upload)
 - ⬜ Campaign templates
