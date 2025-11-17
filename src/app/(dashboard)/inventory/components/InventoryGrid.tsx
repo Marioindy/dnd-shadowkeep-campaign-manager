@@ -11,12 +11,12 @@ import InventoryItem from './InventoryItem';
  */
 export default function InventoryGrid() {
   const items = [
-    { id: '1', name: 'Longsword +1', type: 'weapon', quantity: 1, weight: 3 },
-    { id: '2', name: 'Health Potion', type: 'potion', quantity: 5, weight: 0.5 },
-    { id: '3', name: 'Rope (50 ft)', type: 'tool', quantity: 1, weight: 10 },
-    { id: '4', name: 'Torch', type: 'tool', quantity: 10, weight: 1 },
-    { id: '5', name: 'Rations', type: 'misc', quantity: 7, weight: 2 },
-    { id: '6', name: 'Gold Pieces', type: 'misc', quantity: 237, weight: 0.02 },
+    { _id: '1', characterId: 'char1', name: 'Longsword +1', type: 'weapon', quantity: 1, weight: 3 },
+    { _id: '2', characterId: 'char1', name: 'Health Potion', type: 'potion', quantity: 5, weight: 0.5 },
+    { _id: '3', characterId: 'char1', name: 'Rope (50 ft)', type: 'tool', quantity: 1, weight: 10 },
+    { _id: '4', characterId: 'char1', name: 'Torch', type: 'tool', quantity: 10, weight: 1 },
+    { _id: '5', characterId: 'char1', name: 'Rations', type: 'misc', quantity: 7, weight: 2 },
+    { _id: '6', characterId: 'char1', name: 'Gold Pieces', type: 'misc', quantity: 237, weight: 0.02 },
   ];
 
   const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0);
@@ -33,7 +33,7 @@ export default function InventoryGrid() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {items.map((item) => (
-          <InventoryItem key={item.id} item={item} />
+          <InventoryItem key={item._id} item={item} />
         ))}
       </div>
 
