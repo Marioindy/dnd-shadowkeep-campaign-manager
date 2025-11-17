@@ -16,6 +16,17 @@ interface CardProps {
  * @returns A div element styled as a card containing `children`
  */
 export function Card({ children, className, onClick }: CardProps) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (onClick) {
+      if (event.key === 'Enter') {
+        onClick();
+      } else if (event.key === ' ') {
+        event.preventDefault();
+        onClick();
+      }
+    }
+  };
+
   return (
     <div
       className={clsx(
@@ -24,6 +35,11 @@ export function Card({ children, className, onClick }: CardProps) {
         className
       )}
       onClick={onClick}
+      {...(onClick && {
+        role: 'button',
+        tabIndex: 0,
+        onKeyDown: handleKeyDown
+      })}
     >
       {children}
     </div>
