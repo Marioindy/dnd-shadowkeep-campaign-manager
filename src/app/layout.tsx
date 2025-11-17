@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import '../styles/globals.css';
+import { ConvexClientProvider } from '@/providers/ConvexClientProvider';
+import { AuthProvider } from '@/providers/AuthProvider';
 import { OfflineProvider } from '../contexts/OfflineContext';
 import { OfflineIndicator } from '../components/shared/OfflineIndicator';
 
@@ -28,6 +30,8 @@ export const metadata: Metadata = {
 
 /**
  * Provides the root HTML layout for the application and renders `children` inside the document body.
+ * Wraps the application with ConvexProvider, AuthProvider, and OfflineProvider for authentication,
+ * real-time data, and offline functionality.
  *
  * @param children - The React nodes to render inside the page's <body>.
  * @returns The root `<html>` element containing a `<body>` that wraps `children`.
@@ -40,10 +44,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <OfflineProvider>
-          {children}
-          <OfflineIndicator />
-        </OfflineProvider>
+        <ConvexClientProvider>
+          <AuthProvider>
+            <OfflineProvider>
+              {children}
+              <OfflineIndicator />
+            </OfflineProvider>
+          </AuthProvider>
+        </ConvexClientProvider>
       </body>
     </html>
   );
