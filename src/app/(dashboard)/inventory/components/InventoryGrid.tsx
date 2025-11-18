@@ -10,7 +10,7 @@ import InventoryItem from './InventoryItem';
  * @returns A JSX element containing the inventory grid UI.
  */
 export default function InventoryGrid() {
-  const items = [
+  const items: any[] = [
     { id: '1', name: 'Longsword +1', type: 'weapon' as const, quantity: 1, weight: 3 },
     { id: '2', name: 'Health Potion', type: 'potion' as const, quantity: 5, weight: 0.5 },
     { id: '3', name: 'Rope (50 ft)', type: 'tool' as const, quantity: 1, weight: 10 },

@@ -6,7 +6,7 @@ import { api } from '../../../../../convex/_generated/api';
 import { useAuth } from '@/providers/AuthProvider';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import ErrorMessage from '@/components/shared/ErrorMessage';
 import { validateUsername, validatePassword } from '@/lib/auth';
@@ -149,7 +149,7 @@ export default function AdminUsersPage() {
 
             {users && users.length > 0 && (
               <div className="space-y-3">
-                {users.map((u) => (
+                {users.map((u: any) => (
                   <div
                     key={u._id}
                     className="bg-gray-800/50 rounded-lg p-4 flex justify-between items-center"

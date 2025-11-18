@@ -20,12 +20,10 @@ export const getReviews = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
 
-    let reviews = await ctx.db
-      .query('reviews')
-      .withIndex('by_content', (q) =>
-        q.eq('contentType', args.contentType).eq('contentId', args.contentId)
-      )
-      .collect();
+    const allReviews = await ctx.db.query('reviews').collect();
+    let reviews = allReviews.filter(
+      (r) => r.contentType === args.contentType && r.contentId === args.contentId
+    );
 
     // Sort
     if (args.sortBy === 'rating') {
@@ -79,12 +77,10 @@ export const getReviewStats = query({
     contentId: v.string(),
   },
   handler: async (ctx, args) => {
-    const reviews = await ctx.db
-      .query('reviews')
-      .withIndex('by_content', (q) =>
-        q.eq('contentType', args.contentType).eq('contentId', args.contentId)
-      )
-      .collect();
+    const allReviews = await ctx.db.query('reviews').collect();
+    const reviews = allReviews.filter(
+      (r) => r.contentType === args.contentType && r.contentId === args.contentId
+    );
 
     const ratingCounts = {
       1: 0,
@@ -284,14 +280,12 @@ async function updateContentRating(
   contentType: 'campaign' | 'character' | 'map',
   contentId: string
 ) {
-  const reviews = await ctx.db
-    .query('reviews')
-    .withIndex('by_content', (q) =>
-      q.eq('contentType', contentType).eq('contentId', contentId)
-    )
-    .collect();
+  const allReviews = await ctx.db.query('reviews').collect();
+  const reviews = allReviews.filter(
+    (r: any) => r.contentType === contentType && r.contentId === contentId
+  );
 
-  const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+  const totalRating = reviews.reduce((sum: number, r: any) => sum + r.rating, 0);
   const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
 
   let table: 'sharedCampaigns' | 'sharedCharacters' | 'sharedMaps';

@@ -103,6 +103,14 @@ export interface MapMarker {
   visible: boolean;
 }
 
+export interface FogOfWarLayer {
+  id: string;
+  mapId: string;
+  points: Array<{ x: number; y: number }>;
+  revealed: boolean;
+  opacity?: number;
+}
+
 // Campaign Types
 export interface Campaign {
   _id: string;

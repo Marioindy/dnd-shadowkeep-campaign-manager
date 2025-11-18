@@ -25,13 +25,15 @@ export const browseSharedCampaigns = query({
     const limit = args.limit || 20;
     const offset = args.offset || 0;
 
-    let query = ctx.db.query('sharedCampaigns');
-
+    let campaigns;
     if (args.category) {
-      query = query.withIndex('by_category', (q) => q.eq('category', args.category));
+      campaigns = await ctx.db
+        .query('sharedCampaigns')
+        .withIndex('by_category', (q) => q.eq('category', args.category))
+        .collect();
+    } else {
+      campaigns = await ctx.db.query('sharedCampaigns').collect();
     }
-
-    let campaigns = await query.collect();
 
     // Sort
     if (args.sortBy === 'popular') {
@@ -120,13 +122,15 @@ export const browseSharedCharacters = query({
     const limit = args.limit || 20;
     const offset = args.offset || 0;
 
-    let query = ctx.db.query('sharedCharacters');
-
+    let characters;
     if (args.class) {
-      query = query.withIndex('by_class', (q) => q.eq('class', args.class));
+      characters = await ctx.db
+        .query('sharedCharacters')
+        .withIndex('by_class', (q) => q.eq('class', args.class))
+        .collect();
+    } else {
+      characters = await ctx.db.query('sharedCharacters').collect();
     }
-
-    let characters = await query.collect();
 
     // Sort
     if (args.sortBy === 'popular') {
@@ -207,13 +211,15 @@ export const browseSharedMaps = query({
     const limit = args.limit || 20;
     const offset = args.offset || 0;
 
-    let query = ctx.db.query('sharedMaps');
-
+    let maps;
     if (args.category) {
-      query = query.withIndex('by_category', (q) => q.eq('category', args.category));
+      maps = await ctx.db
+        .query('sharedMaps')
+        .withIndex('by_category', (q) => q.eq('category', args.category))
+        .collect();
+    } else {
+      maps = await ctx.db.query('sharedMaps').collect();
     }
-
-    let maps = await query.collect();
 
     // Sort
     if (args.sortBy === 'popular') {
@@ -348,7 +354,7 @@ export const searchSharedContent = query({
         (c) =>
           c.name.toLowerCase().includes(searchLower) ||
           c.description.toLowerCase().includes(searchLower) ||
-          c.tags.some((t) => t.toLowerCase().includes(searchLower))
+          c.tags.some((t: string) => t.toLowerCase().includes(searchLower))
       );
       results.push(
         ...filtered.map((c) => ({ ...c, _type: 'campaign' as const }))
@@ -362,7 +368,7 @@ export const searchSharedContent = query({
           c.name.toLowerCase().includes(searchLower) ||
           c.description.toLowerCase().includes(searchLower) ||
           c.class.toLowerCase().includes(searchLower) ||
-          c.tags.some((t) => t.toLowerCase().includes(searchLower))
+          c.tags.some((t: string) => t.toLowerCase().includes(searchLower))
       );
       results.push(
         ...filtered.map((c) => ({ ...c, _type: 'character' as const }))
@@ -375,7 +381,7 @@ export const searchSharedContent = query({
         (m) =>
           m.name.toLowerCase().includes(searchLower) ||
           m.description.toLowerCase().includes(searchLower) ||
-          m.tags.some((t) => t.toLowerCase().includes(searchLower))
+          m.tags.some((t: string) => t.toLowerCase().includes(searchLower))
       );
       results.push(...filtered.map((m) => ({ ...m, _type: 'map' as const })));
     }

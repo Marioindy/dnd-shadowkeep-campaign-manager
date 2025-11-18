@@ -24,13 +24,15 @@ export const getPosts = query({
     const limit = args.limit || 20;
     const offset = args.offset || 0;
 
-    let query = ctx.db.query('posts');
-
+    let posts;
     if (args.type) {
-      query = query.withIndex('by_type', (q) => q.eq('type', args.type));
+      posts = await ctx.db
+        .query('posts')
+        .withIndex('by_type', (q) => q.eq('type', args.type))
+        .collect();
+    } else {
+      posts = await ctx.db.query('posts').collect();
     }
-
-    let posts = await query.collect();
 
     // Sort
     if (args.sortBy === 'popular') {
@@ -193,12 +195,10 @@ export const getComments = query({
     parentCommentId: v.optional(v.id('comments')),
   },
   handler: async (ctx, args) => {
-    let comments = await ctx.db
-      .query('comments')
-      .withIndex('by_content', (q) =>
-        q.eq('contentType', args.contentType).eq('contentId', args.contentId)
-      )
-      .collect();
+    const allComments = await ctx.db.query('comments').collect();
+    let comments = allComments.filter(
+      (c) => c.contentType === args.contentType && c.contentId === args.contentId
+    );
 
     // Filter by parent if specified
     if (args.parentCommentId !== undefined) {
@@ -362,15 +362,13 @@ export const getUserReaction = query({
     contentId: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query('reactions')
-      .withIndex('by_user_and_content', (q) =>
-        q
-          .eq('userId', args.userId)
-          .eq('contentType', args.contentType)
-          .eq('contentId', args.contentId)
-      )
-      .first();
+    const allReactions = await ctx.db.query('reactions').collect();
+    return allReactions.find(
+      (r) =>
+        r.userId === args.userId &&
+        r.contentType === args.contentType &&
+        r.contentId === args.contentId
+    ) || null;
   },
 });
 
@@ -395,15 +393,13 @@ export const toggleReaction = mutation({
   },
   handler: async (ctx, args) => {
     // Check if reaction already exists
-    const existing = await ctx.db
-      .query('reactions')
-      .withIndex('by_user_and_content', (q) =>
-        q
-          .eq('userId', args.userId)
-          .eq('contentType', args.contentType)
-          .eq('contentId', args.contentId)
-      )
-      .first();
+    const allReactions = await ctx.db.query('reactions').collect();
+    const existing = allReactions.find(
+      (r) =>
+        r.userId === args.userId &&
+        r.contentType === args.contentType &&
+        r.contentId === args.contentId
+    );
 
     if (existing) {
       // Remove reaction

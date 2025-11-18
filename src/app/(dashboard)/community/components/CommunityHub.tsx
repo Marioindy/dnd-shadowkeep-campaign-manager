@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import Button from '@/components/ui/Button';
 
 type TabType = 'discover' | 'posts' | 'myContent';
 
@@ -186,7 +186,7 @@ function MyContentTab() {
         <CardContent className="pt-6">
           <div className="text-center text-gray-400 py-12">
             <p className="text-lg mb-4">
-              You haven't shared any content yet
+              You haven&apos;t shared any content yet
             </p>
             <p className="text-sm">
               Share your campaigns, characters, or maps with the community!
