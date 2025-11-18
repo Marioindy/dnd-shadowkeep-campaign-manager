@@ -10,13 +10,13 @@ import InventoryItem from './InventoryItem';
  * @returns A JSX element containing the inventory grid UI.
  */
 export default function InventoryGrid() {
-  const items = [
-    { id: '1', name: 'Longsword +1', type: 'weapon', quantity: 1, weight: 3 },
-    { id: '2', name: 'Health Potion', type: 'potion', quantity: 5, weight: 0.5 },
-    { id: '3', name: 'Rope (50 ft)', type: 'tool', quantity: 1, weight: 10 },
-    { id: '4', name: 'Torch', type: 'tool', quantity: 10, weight: 1 },
-    { id: '5', name: 'Rations', type: 'misc', quantity: 7, weight: 2 },
-    { id: '6', name: 'Gold Pieces', type: 'misc', quantity: 237, weight: 0.02 },
+  const items: any[] = [
+    { id: '1', name: 'Longsword +1', type: 'weapon' as const, quantity: 1, weight: 3 },
+    { id: '2', name: 'Health Potion', type: 'potion' as const, quantity: 5, weight: 0.5 },
+    { id: '3', name: 'Rope (50 ft)', type: 'tool' as const, quantity: 1, weight: 10 },
+    { id: '4', name: 'Torch', type: 'tool' as const, quantity: 10, weight: 1 },
+    { id: '5', name: 'Rations', type: 'misc' as const, quantity: 7, weight: 2 },
+    { id: '6', name: 'Gold Pieces', type: 'misc' as const, quantity: 237, weight: 0.02 },
   ];
 
   const totalWeight = items.reduce((sum, item) => sum + item.weight * item.quantity, 0);

@@ -153,6 +153,29 @@ export default defineSchema({
     ),
   }).index('by_session', ['sessionId']),
 
+  diceRolls: defineTable({
+    sessionId: v.optional(v.id('sessions')),
+    userId: v.id('users'),
+    characterName: v.optional(v.string()),
+    diceType: v.string(), // "d4", "d6", "d8", "d10", "d12", "d20", "d100"
+    diceCount: v.number(),
+    modifier: v.number(),
+    rollType: v.union(
+      v.literal('normal'),
+      v.literal('advantage'),
+      v.literal('disadvantage')
+    ),
+    results: v.array(v.number()), // Individual die results
+    total: v.number(),
+    timestamp: v.number(),
+    purpose: v.optional(v.string()), // "Attack", "Damage", "Skill Check", etc.
+    targetDC: v.optional(v.number()),
+    success: v.optional(v.boolean()),
+  })
+    .index('by_session', ['sessionId'])
+    .index('by_user', ['userId'])
+    .index('by_timestamp', ['timestamp']),
+
   // ============== COMMUNITY FEATURES ==============
 
   // Shared campaign templates

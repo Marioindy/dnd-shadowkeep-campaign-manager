@@ -140,7 +140,7 @@ export const FogAnimations = {
   /**
    * Reveal fog area with a fade-out effect
    */
-  revealArea(element: HTMLElement, options: AnimationOptions = {}) {
+  revealArea(element: HTMLElement | SVGElement, options: AnimationOptions = {}) {
     const {
       duration = 1.2,
       ease = 'power2.inOut',
@@ -158,7 +158,7 @@ export const FogAnimations = {
   /**
    * Hide area with fog using fade-in effect
    */
-  hideArea(element: HTMLElement, options: AnimationOptions = {}) {
+  hideArea(element: HTMLElement | SVGElement, options: AnimationOptions = {}) {
     const {
       duration = 1.0,
       ease = 'power2.inOut',
@@ -207,7 +207,7 @@ export const FogAnimations = {
    * Animate fog opacity change
    */
   setOpacity(
-    elements: HTMLElement | HTMLElement[],
+    elements: HTMLElement | SVGElement | (HTMLElement | SVGElement)[],
     opacity: number,
     options: AnimationOptions = {}
   ) {
@@ -224,7 +224,7 @@ export const FogAnimations = {
   /**
    * Ripple effect when revealing fog
    */
-  rippleReveal(element: HTMLElement, options: AnimationOptions = {}) {
+  rippleReveal(element: HTMLElement | SVGElement, options: AnimationOptions = {}) {
     const { duration = 1.5, ease = 'power2.out', onComplete } = options;
 
     // Create expanding circle effect

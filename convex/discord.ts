@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { mutation, query, action } from './_generated/server';
+import { api } from './_generated/api';
 
 // ============== DISCORD WEBHOOK QUERIES ==============
 
@@ -30,6 +31,43 @@ export const getWebhook = query({
   args: { webhookId: v.id('discordWebhooks') },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.webhookId);
+  },
+});
+
+// Get active webhooks for an event
+export const getActiveWebhooksForEvent = query({
+  args: {
+    eventType: v.union(
+      v.literal('session_start'),
+      v.literal('session_end'),
+      v.literal('character_update'),
+      v.literal('new_post'),
+      v.literal('combat_start')
+    ),
+    campaignId: v.optional(v.id('campaigns')),
+    userId: v.optional(v.id('users')),
+  },
+  handler: async (ctx, args) => {
+    let webhooks = await ctx.db.query('discordWebhooks').collect();
+
+    // Filter by campaign if provided
+    if (args.campaignId) {
+      webhooks = webhooks.filter(
+        (w) => w.campaignId === args.campaignId || !w.campaignId
+      );
+    }
+
+    // Filter by user if provided
+    if (args.userId) {
+      webhooks = webhooks.filter((w) => w.userId === args.userId);
+    }
+
+    // Filter by event type and active status
+    webhooks = webhooks.filter(
+      (w) => w.isActive && w.events.includes(args.eventType)
+    );
+
+    return webhooks;
   },
 });
 
@@ -164,7 +202,7 @@ export const sendDiscordNotification = mutation({
 });
 
 // Trigger event notification
-export const triggerEventNotification = mutation({
+export const triggerEventNotification = action({
   args: {
     eventType: v.union(
       v.literal('session_start'),
@@ -178,32 +216,19 @@ export const triggerEventNotification = mutation({
     data: v.any(),
   },
   handler: async (ctx, args) => {
-    // Find relevant webhooks
-    let webhooks = await ctx.db.query('discordWebhooks').collect();
-
-    // Filter by campaign if provided
-    if (args.campaignId) {
-      webhooks = webhooks.filter(
-        (w) => w.campaignId === args.campaignId || !w.campaignId
-      );
-    }
-
-    // Filter by user if provided
-    if (args.userId) {
-      webhooks = webhooks.filter((w) => w.userId === args.userId);
-    }
-
-    // Filter by event type and active status
-    webhooks = webhooks.filter(
-      (w) => w.isActive && w.events.includes(args.eventType)
-    );
+    // Find relevant webhooks using the query
+    const webhooks = await ctx.runQuery(api.discord.getActiveWebhooksForEvent, {
+      eventType: args.eventType,
+      campaignId: args.campaignId,
+      userId: args.userId,
+    });
 
     // Send notifications to all matching webhooks
     const results = await Promise.all(
-      webhooks.map(async (webhook) => {
+      webhooks.map(async (webhook: any) => {
         const embed = buildDiscordEmbed(args.eventType, args.data);
 
-        return await ctx.runMutation(sendDiscordNotification, {
+        return await ctx.runMutation(api.discord.sendDiscordNotification, {
           webhookUrl: webhook.webhookUrl,
           embeds: [embed],
         });
@@ -322,10 +347,12 @@ function buildDiscordEmbed(
 }
 
 // Test webhook connection
-export const testWebhook = mutation({
+export const testWebhook = action({
   args: { webhookId: v.id('discordWebhooks') },
   handler: async (ctx, args) => {
-    const webhook = await ctx.db.get(args.webhookId);
+    const webhook = await ctx.runQuery(api.discord.getWebhook, {
+      webhookId: args.webhookId,
+    });
     if (!webhook) {
       throw new Error('Webhook not found');
     }
@@ -341,7 +368,7 @@ export const testWebhook = mutation({
       },
     };
 
-    return await ctx.runMutation(sendDiscordNotification, {
+    return await ctx.runMutation(api.discord.sendDiscordNotification, {
       webhookUrl: webhook.webhookUrl,
       embeds: [embed],
     });
